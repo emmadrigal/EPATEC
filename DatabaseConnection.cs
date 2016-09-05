@@ -1,3 +1,5 @@
+using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
@@ -10,6 +12,7 @@ namespace DatabaseConnection
         private const string serverurl = "localhost";
         private const string database = "database";
 
+        //Constructor, inicializa la interfaz con la base de datos, crea el objeto SqlConnection que se encarga de la coneccion
         public Connection(){
             myConnection = new SqlConnection("Server="  + serverurl + ";"+
                                               "Database="+ database  + ";"+
@@ -38,9 +41,57 @@ namespace DatabaseConnection
             string comando = "INSERT INTO CLIENTE (Cedula_Cliente, Nombre, Apellidos, Grado_de_Penalizacion, Lugar_de_Residencia, Fecha_de_Nacimiento, Telefono) VALUES ('@Cedula', '@Nombre', '@Apellidos', 0, '@Residencia', '@FechaNacimiento', '@Telefono'); ";
         }
 
+        public void update_Nombre_Cliente(int cedula, string nombre){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Nombre", nombre);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            string command = "UPDATE CLIENTE SET Nombre = @Nombre WHERE Cedula_Cliente = @Cedula;";
+        }
+
+        public void update_Apellido_Cliente(int cedula, string Apellido){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Apellido", Apellido);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            string command = "UPDATE CLIENTE SET Apellidos = @Apellido WHERE Cedula_Cliente = @Cedula;";
+        }
+
+        public void update_Penalizacion_Cliente(int cedula, string penalizacion){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Nombre", nombre);
+            myparm[1] = new SqlParameter("@Grado_de_Penalizacion", penalizacion);
+
+            string command = "UPDATE CLIENTE SET Grado_de_Penalizacion = @Grado_de_Penalizacion WHERE Cedula_Cliente = @Cedula;";
+        }
+
+        public void update_Residencia_Cliente(int cedula, string Residencia){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Residencia", Residencia);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            string command = "UPDATE CLIENTE SET Residencia = @Nombre Residencia Cedula_Cliente = @Cedula;";
+        }
+
+        public void update_Nacimiento_Cliente(int cedula, string Nacimiento){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Nacimiento", Nacimiento);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            string command = "UPDATE CLIENTE SET Nacimiento = @Nacimiento WHERE Cedula_Cliente = @Cedula;";
+        }
+
+        public void update_Telefono_Cliente(int cedula, string Telefono){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Telefono", Telefono);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            string command = "UPDATE CLIENTE SET Telefono = @Telefono WHERE Cedula_Cliente = @Cedula;";
+        }
+
         //Elimina un cliente de la base de datos basado en su cedula
         public void eliminar_Cliente(int cedula){
-            SqlParameter cedula = new SqlParameter("@Cedula", cedula);
+            SqlParameter myparm = new SqlParameter("@Cedula", cedula);
 
             string comando = "DELETE FROM CLIENTE WHERE Cedula_Cliente = @Cedula;";
         }
@@ -59,6 +110,41 @@ namespace DatabaseConnection
             string comando = "INSERT INTO PROVEEDOR (Cedula_Proveedor, Nombre, Apellidos, Fecha_de_Nacimiento, Lugar_de_Residencia) VALUES ('@Cedula', '@Nombre', '@Apellidos', '@FechaNacimiento', '@Residencia'); ";
         }
 
+        public void update_Nombre_Proovedor(int cedula, string Nombre){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Nombre", Nombre);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            string command = "UPDATE PROOVEDOR SET Nombre = @Nombre WHERE Cedula_Proveedor = @Cedula;";
+        }
+
+        public void update_Apellidos_Proovedor(int cedula, string Apellidos){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Apellidos", Apellidos);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            string command = "UPDATE PROOVEDOR SET Apellidos = @Apellidos WHERE Cedula_Proveedor = @Cedula;";
+        }
+
+        public void update_Nacimiento_Proovedor(int cedula, string Nacimiento){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Nacimiento", SqlDbType.DateTime);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            myparm[0].Value = Nacimiento;//Agrega la fecha bajo el formato correcto
+
+
+            string command = "UPDATE PROOVEDOR SET Nacimiento = @Nacimiento WHERE Cedula_Proveedor = @Cedula;";
+        }
+
+        public void update_Residencia_Proovedor(int cedula, string Residencia){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Residencia", Residencia);
+            myparm[1] = new SqlParameter("@Cedula", cedula);
+
+            string command = "UPDATE PROOVEDOR SET Residencia = @Residencia WHERE Cedula_Proveedor = @Cedula;";
+        }
+
         //Elimina un producto de la base de datos basado en su nombre
         public void eliminar_Proovedor(int cedula_Proovedor){
             SqlParameter cedula = new SqlParameter("@Cedula", cedula_Proovedor);
@@ -73,6 +159,20 @@ namespace DatabaseConnection
             myparm[1] = new SqlParameter("@Nombre",      nombre);
 
             string comando = "INSERT INTO CLIENTE (Nombre, Descripcion) VALUES ('@Nombre', '@Descripcion'); ";
+        }
+
+        public void update_Descripcion_Categoria(int cedula, string Descripcion){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Descripcion", Descripcion);
+            myparm[1] = new SqlParameter("@Nombre",      Nombre);
+
+            string command = "UPDATE CATEGORIA SET Descripcion = @Descripcion WHERE Nombre = @Nombre;";
+        }
+
+        public void update_Nombre_Categoria(int cedula, string Nombre){
+            SqlParameter myparm = new SqlParameter("@Nombre", Nombre);
+
+            string command = "UPDATE CATEGORIA SET Nombre = @Nombre WHERE Nombre = @Nombre;";
         }
 
         //Elimina un producto de la base de datos basado en su nombre
@@ -107,6 +207,32 @@ namespace DatabaseConnection
             string comando = "INSERT INTO EMPLEADO (Id_Empleado, Id_Sucursal, Nombre, Puesto) VALUES ('@id', '@Nombre', '@Sucursal', '@Puesto'); ";
         }
 
+        public void update_Nombre_Empleado(int id, string Nombre){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Nombre", Nombre);
+            myparm[1] = new SqlParameter("@id", id);
+
+            string command = "UPDATE EMPLEADO SET Nombre = @Nombre WHERE id = @id;";
+        }
+
+        public void update_Sucursal_Empleado(int id, string Sucursal){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Sucursal", Sucursal);
+            myparm[1] = new SqlParameter("@id", id);
+
+            string command = "UPDATE EMPLEADO SET Sucursal = @Sucursal WHERE id = @id;";
+        }
+
+        public void update_Puesto_Empleado(int id, string Puesto){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Puesto", Puesto);
+            myparm[1] = new SqlParameter("@id", id);
+
+            string command = "UPDATE EMPLEADO SET Puesto = @Puesto WHERE id = @id;";
+        }
+
+        
+
         //Elimina un Empleado de la base de datos basado en su id
         public void eliminar_Empleado(int id){
             SqlParameter id_Empleado = new SqlParameter("@id", id);
@@ -127,8 +253,34 @@ namespace DatabaseConnection
             myparm[4] = new SqlParameter("@Exento",      exento);
             myparm[5] = new SqlParameter("@Cantidad",    cantidadDisponible);
 
-            string comando = "INSERT INTO PRODUCTO (Nombre, Sucursal, Proovedor, Categoria, Descripcion, Exento, Cantidad) VALUES ('@Nombre', '@Sucursal', '@Proovedor', '@Categoria', '@Descripcion', '@Exento', '@Cantidad'); ";
+            string comando = "INSERT INTO PRODUCTO (Nombre, Sucursal, Proovedor, Categoria, Descripcion, Exento, Cantidad_Disponible) VALUES ('@Nombre', '@Sucursal', '@Proovedor', '@Categoria', '@Descripcion', '@Exento', '@Cantidad'); ";
         }
+
+        public void update_Nombre_Producto(int id, string Nombre){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Nombre", Nombre);
+            myparm[1] = new SqlParameter("@id", id);
+
+            string command = "UPDATE PRODUCTO SET Nombre = @Nombre WHERE id = @id;";
+        }
+
+        public void update_Descripcion_Producto(int id, string Descripcion){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Descripcion", Descripcion);
+            myparm[1] = new SqlParameter("@id", id);
+
+            string command = "UPDATE PRODUCTO SET Descripcion = @Descripcion WHERE id = @id;";
+        }
+
+        public void update_Cantidad_Producto(int id, int Cantidad){
+            SqlParameter[] myparm = new SqlParameter[2];
+            myparm[0] = new SqlParameter("@Cantidad", Cantidad);
+            myparm[1] = new SqlParameter("@id", id);
+
+            string command = "UPDATE PRODUCTO SET Cantidad = @Cantidad WHERE id = @id;";
+        }
+
+
 
         //Elimina un producto de la base de datos basado en su nombre
         public void eliminar_Producto(int Nombre){
@@ -150,7 +302,7 @@ namespace DatabaseConnection
 
 
             string comando_Productos = "INSERT INTO CONTIENE (Nombre_Producto, Id_Pedido) VALUES ('@Producto', '@Pedido'); ";
-            SQLCommand command = new SQLCommand(comando_Productos, myConnection);
+            SqlCommand   command = new SqlCommand  (comando_Productos, myConnection);
             command.Parameters.Add("@Pedido", SqlDbType.Int);
             command.Parameters.Add("@Producto", SqlDbType.NVarChar);
             foreach (string producto in Productos){
