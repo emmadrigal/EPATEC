@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<DataBase>
+    <username>user</username>
+    <password>password</password>
+    <serverurl>localhost\DESKTOP-KAP1UKU\SQLSERVER</serverurl>
+    <database>EPATEC</database>
+</DataBase>
