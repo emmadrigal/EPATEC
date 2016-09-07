@@ -9,31 +9,29 @@ namespace DatabaseConnection
 {
     public class Connection{
         private SqlConnection myConnection;
+        /*
         private string username;
         private string password;
         private string serverurl;
         private string database;
+        */
 
         //Constructor, inicializa la interfaz con la base de datos, crea el objeto SqlConnection que se encarga de la coneccion
         public Connection(){
             XmlDocument doc = new XmlDocument();
             string path = Application.StartupPath;
             doc.Load(path + "\\config.xml");
-    
-            username  = doc.ChildNodes[1].InnerText;
-            password  = doc.ChildNodes[2].InnerText;
-            serverurl = doc.ChildNodes[3].InnerText;
-            database  = doc.ChildNodes[4].InnerText;
-            myConnection = new SqlConnection("Server="  + serverurl + ";"+
-                                              "Database="+ database  + ";"+
-                                              "User Id=" + username  + ";"+
-                                              "Password="+ password  + ";");
-            try{
-                myConnection.Open();
-            }
-            catch(Exception e){
-                Console.WriteLine(e.ToString());
-            }
+
+            string server   =  doc["DataBase"]["server"].InnerText;
+            string DBname   =  doc["DataBase"]["database"].InnerText;
+            string username =  doc["DataBase"]["username"].InnerText;
+            string password =  doc["DataBase"]["password"].InnerText;
+            string connectionString = "Persist Security Info=False;"+
+                                       "User ID="          + username +
+                                       ";PWD="             + password+
+                                       ";Initial Catalog=" + DBname +
+                                       ";Data Source="     + server;
+            myConnection = new SqlConnection(connectionString);
         }
 
         //Crea un nuevo cliente y lo agrega a la base de datos
@@ -48,9 +46,38 @@ namespace DatabaseConnection
 
             myparm[4].Value = fechaNacimiento;//Agrega la fecha bajo el formato correcto
 
-            string command = "INSERT INTO CLIENTE (Cedula_Cliente, Nombre, Apellidos, Grado_de_Penalizacion, Lugar_de_Residencia, Fecha_de_Nacimiento, Telefono) VALUES ('@Cedula', '@Nombre', '@Apellidos', 0, '@Residencia', '@FechaNacimiento', '@Telefono'); ";
+            string command = "INSERT INTO CLIENTE (Cedula_Cliente, Nombre, Apellidos, Grado_de_Penalizacion, Lugar_de_Residencia, Fecha_de_Nacimiento, Telefono) VALUES (@Cedula, @Nombre, @Apellidos, 0, @Residencia, @FechaNacimiento, @Telefono); ";
 
             ExecuteCommandWrite(command, myparm);
+        }
+
+        public Company.Cliente get_Cliente(int cedula){
+            SqlParameter myparm = new SqlParameter("@Cedula", cedula);
+
+            string command = "SELECT FROM CLIENTE WHERE Cedula_Cliente = @Cedula;";
+            using(myConnection){
+                SqlCommand comando = new SqlCommand(command, myConnection);
+
+                comando.Parameters.Add(myparm);
+
+                SqlDataReader reader = comando.ExecuteReader();
+                
+                if (reader.Read())
+                {
+                    Company.Cliente cliente = new Company.Cliente(); 
+                    cliente.Cedula_Cliente = reader.GetInt32(0);
+                    cliente.Nombre         = reader.GetString(1);
+                    cliente.Apellidos      = reader.GetString(2);
+                    cliente.Penalizacion   = reader.GetByte(3);
+                    cliente.Residencia     = reader.GetString(4);
+                    cliente.Nacimiento     = reader.GetString(5);
+                    cliente.Telefono       = reader.GetInt32(6);
+                    return cliente;
+                }
+                else{
+                    return null;
+                }
+            }
         }
 
         public void update_Nombre_Cliente(int cedula, string nombre){
@@ -133,7 +160,7 @@ namespace DatabaseConnection
 
             myparm[4].Value = fechaNacimiento;//Agrega la fecha bajo el formato correcto
 
-            string command = "INSERT INTO PROVEEDOR (Cedula_Proveedor, Nombre, Apellidos, Fecha_de_Nacimiento, Lugar_de_Residencia) VALUES ('@Cedula', '@Nombre', '@Apellidos', '@FechaNacimiento', '@Residencia'); ";
+            string command = "INSERT INTO PROVEEDOR (Cedula_Proveedor, Nombre, Apellidos, Fecha_de_Nacimiento, Lugar_de_Residencia) VALUES (@Cedula, @Nombre, @Apellidos, @FechaNacimiento, @Residencia); ";
 
             ExecuteCommandWrite(command, myparm);
         }
@@ -196,7 +223,7 @@ namespace DatabaseConnection
             myparm[0] = new SqlParameter("@Descripcion", descripcion);
             myparm[1] = new SqlParameter("@Nombre",      nombre);
 
-            string command = "INSERT INTO CLIENTE (Nombre, Descripcion) VALUES ('@Nombre', '@Descripcion'); ";
+            string command = "INSERT INTO CLIENTE (Nombre, Descripcion) VALUES (@Nombre, @Descripcion); ";
 
             ExecuteCommandWrite(command, myparm);
         }
@@ -232,7 +259,7 @@ namespace DatabaseConnection
         public void crear_Sucursal(int id_Sucursal){
             SqlParameter id = new SqlParameter("@id_Sucursal", id_Sucursal);
 
-            string command = "INSERT INTO SUCURSAL (id_Sucursal) VALUES ('@id'); ";
+            string command = "INSERT INTO SUCURSAL (id_Sucursal) VALUES (@id); ";
 
             ExecuteCommandWriteOneParam(command, id);
         }
@@ -254,7 +281,7 @@ namespace DatabaseConnection
             myparm[2] = new SqlParameter("@Sucursal", Sucursal);
             myparm[3] = new SqlParameter("@Puesto",      puesto);
 
-            string command = "INSERT INTO EMPLEADO (Id_Empleado, Id_Sucursal, Nombre, Puesto) VALUES ('@id', '@Nombre', '@Sucursal', '@Puesto'); ";
+            string command = "INSERT INTO EMPLEADO (Id_Empleado, Id_Sucursal, Nombre, Puesto) VALUES (@id, @Nombre, @Sucursal, @Puesto); ";
 
             ExecuteCommandWrite(command, myparm);
         }
@@ -289,8 +316,6 @@ namespace DatabaseConnection
             ExecuteCommandWrite(command, myparm);
         }
 
-        
-
         //Elimina un Empleado de la base de datos basado en su id
         public void eliminar_Empleado(int id){
             SqlParameter id_Empleado = new SqlParameter("@id", id);
@@ -313,7 +338,7 @@ namespace DatabaseConnection
             myparm[4] = new SqlParameter("@Exento",      exento);
             myparm[5] = new SqlParameter("@Cantidad",    cantidadDisponible);
 
-            string command = "INSERT INTO PRODUCTO (Nombre, Sucursal, Proovedor, Categoria, Descripcion, Exento, Cantidad_Disponible) VALUES ('@Nombre', '@Sucursal', '@Proovedor', '@Categoria', '@Descripcion', '@Exento', '@Cantidad'); ";
+            string command = "INSERT INTO PRODUCTO (Nombre, Sucursal, Proovedor, Categoria, Descripcion, Exento, Cantidad_Disponible) VALUES (@Nombre, @Sucursal, @Proovedor, @Categoria, @Descripcion, @Exento, @Cantidad); ";
 
             ExecuteCommandWrite(command, myparm);
         }
@@ -348,8 +373,6 @@ namespace DatabaseConnection
             ExecuteCommandWrite(command, myparm);
         }
 
-
-
         //Elimina un producto de la base de datos basado en su nombre
         public void eliminar_Producto(int Nombre){
             SqlParameter nombre = new SqlParameter("@Nombre", Nombre);
@@ -368,12 +391,12 @@ namespace DatabaseConnection
             myparm[2] = new SqlParameter("@Telefono", telefono_Preferido);
             myparm[3] = new SqlParameter("@Hora",     hora);
 
-            string command = "INSERT INTO PEDIDO (Cedula_Cliente, Id_Sucursal, Telefono_Preferido, Hora_de_Creacion) VALUES ('@Cedula', '@Sucursal', '@Telefono', '@Hora'); ";
+            string command = "INSERT INTO PEDIDO (Cedula_Cliente, Id_Sucursal, Telefono_Preferido, Hora_de_Creacion) VALUES (@Cedula, @Sucursal, @Telefono, @Hora); ";
 
             ExecuteCommandWrite(command, myparm);
 
 
-            string command_Productos = "INSERT INTO CONTIENE (Nombre_Producto, Id_Pedido) VALUES ('@Producto', '@Pedido'); ";
+            string command_Productos = "INSERT INTO CONTIENE (Nombre_Producto, Id_Pedido) VALUES (@Producto, @Pedido); ";
             SqlCommand comando = new SqlCommand  (command_Productos, myConnection);
             comando.Parameters.Add("@Pedido", SqlDbType.Int);
             comando.Parameters.Add("@Producto", SqlDbType.NVarChar);
@@ -401,19 +424,25 @@ namespace DatabaseConnection
         }
 
         public void ExecuteCommandWrite(string command, SqlParameter[] parms){
-            SqlCommand comando = new SqlCommand(command, myConnection);
+            using(myConnection){
+                myConnection.Open();
+                SqlCommand comando = new SqlCommand(command, myConnection);
 
-            comando.Parameters.AddRange(parms);
+                comando.Parameters.AddRange(parms);
 
-            comando.ExecuteNonQuery();
+                comando.ExecuteNonQuery();
+            }
+
         }
 
         public void ExecuteCommandWriteOneParam(string command, SqlParameter param){
-            SqlCommand comando = new SqlCommand(command, myConnection);
+            using(myConnection){
+                SqlCommand comando = new SqlCommand(command, myConnection);
 
-            comando.Parameters.Add(param);
+                comando.Parameters.Add(param);
 
-            comando.ExecuteNonQuery();
+                comando.ExecuteNonQuery();
+            }
         }
 
         

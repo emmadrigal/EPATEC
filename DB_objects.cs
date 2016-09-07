@@ -10,16 +10,6 @@ namespace Company
 {
     public class Cliente 
     {
-        private int Cedula_Cliente;
-        private string Nombre;
-        private string Apellidos;
-        private byte Penalizacion;
-        private string Residencia;
-        private string Nacimiento;
-        private int Telefono;
-
-        public Employee()
-        { }
 
         /// Propiedad de Cedula
         public int Cedula_Cliente
@@ -64,7 +54,7 @@ namespace Company
         }
 
         /// Propiedad de Nombre
-        public string Telefono
+        public int Telefono
         {
             get { return Telefono; }
             set { Telefono = value; }
@@ -73,7 +63,6 @@ namespace Company
     }
 
     public class Sucursal{
-        private int id;
         
         public Sucursal()
         { }
@@ -87,13 +76,6 @@ namespace Company
     }
 
     public class Producto{
-        private string nombre;
-        private int id_Sucursal;
-        private int Cedula_Provedor;
-        private int id_Categoria;
-        private string Descripcion;
-        private bool Exento;
-        private int Cantidad_Disponible;
         
         public Producto()
         { }
@@ -141,11 +123,6 @@ namespace Company
 
     public class Proovedor 
     {
-        private int Cedula_Proovedor;
-        private string Nombre;
-        private string Apellidos;
-        private string Residencia;
-        private string Nacimiento;
 
         public Proovedor()
         { }
@@ -188,23 +165,14 @@ namespace Company
     }
 
     public class Pedido 
-    {
-        private int id_Pedido;
-        private int Cedula_Cliente;
-        private int id_Sucursal;
-        private string Telefono;
-        private string Hora;
-        private List<Producto> productos;
-
-        public Pedido()
-        { }
+    {       
 
         /// Propiedad de Cedula
-        public int id_Pedido
-        {
+        public int id_Pedido {
             get { return id_Pedido; }
             set { id_Pedido = value; }
         }
+        
 
         /// Propiedad de Nombre
         public int Cedula_Cliente
@@ -234,16 +202,14 @@ namespace Company
             set { Hora = value; }
         }
 
+        public List<Producto> productos{
+            get { return productos; }
+            set { productos = value; }
+        }
+
     }
 
     public class Empleado{
-        private int id_Empleado;
-        private int id_Sucursal;
-        private string Nombre;
-        private string puesto;
-        
-        public Empleado()
-        { }
 
         /// Propiedad de id
         public int id_Empleado
@@ -275,12 +241,6 @@ namespace Company
     }
 
     public class Categoria{
-        private int id;
-        private string Nombre;
-        private string Descripcion;
-        
-        public Categoria()
-        { }
 
         /// Propiedad de id
         public int id
