@@ -79,8 +79,7 @@ namespace RestWebService
                 //Performing Operation - READ"
                 //Data sent via query string
                 //POST - Data sent as name value pair and resides in the <form section> of the browser
-                if (type.Equals("empleado"))
-                {
+                if (type.Equals("empleado")){
                     Company.Empleado emp = DBConnection.get_Empleado(Int32.Parse(id));
                     if (emp == null)
                     {
@@ -97,8 +96,7 @@ namespace RestWebService
                     }
                     Output = JsonConvert.SerializeObject(categoria);
                 }
-                else if (type.Equals("pedido"))
-                {
+                else if (type.Equals("pedido")){
                     Company.Pedido pedido = DBConnection.get_Pedido(Int32.Parse(id));
                     if (pedido == null)
                     {
@@ -124,8 +122,7 @@ namespace RestWebService
                     }
                     Output = JsonConvert.SerializeObject(producto);
                 }
-                else if (type.Equals("cliente"))
-                {
+                else if (type.Equals("cliente")){
                     Company.Cliente cliente = DBConnection.get_Cliente(Int32.Parse(id));
                     if (cliente == null)
                     {

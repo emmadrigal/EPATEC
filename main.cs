@@ -21,48 +21,37 @@ class Product{
 class principal {
       static void Main(){
 
-        Product product = new Product();
+        // Step 1 Create a URI to serve as the base address.
+            Uri baseAddress = new Uri("http://localhost:8000/EPATEC/");
 
-        product.Name = "Apple";
-        product.Price = 3;
+            // Step 2 Create a ServiceHost instance
+            ServiceHost selfHost = new ServiceHost(typeof(Service), baseAddress);
 
-        piece firstPiece = new piece();
-        piece secondpiece = new piece();
-        piece thirdPiece = new piece();
+            try
+            {
+                // Step 3 Add a service endpoint.
+                selfHost.AddServiceEndpoint(typeof(IService), new WSHttpBinding(), "EPATEC_Service");
 
-        firstPiece.name = "Llanta";
-        firstPiece.size = 3;
+                // Step 4 Enable metadata exchange.
+                ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
+                smb.HttpGetEnabled = true;
+                selfHost.Description.Behaviors.Add(smb);
 
-        secondpiece.name = "Rueda";
-        secondpiece.size = 5;
+                // Step 5 Start the service.
+                selfHost.Open();
+                Console.WriteLine("The service is ready.");
+                Console.WriteLine("Press <ENTER> to terminate service.");
+                Console.WriteLine();
+                Console.ReadLine();
 
-        thirdPiece.name = "Capote";
-        thirdPiece.size = -2;
-
-        List<piece> pieces = new List<piece>();
-        pieces.Add(firstPiece);
-        pieces.Add(secondpiece);
-        pieces.Add(thirdPiece);
-
-        product.pieces = pieces;
-
-        string output = JsonConvert.SerializeObject(product);
-        Product product2 = JsonConvert.DeserializeObject<Product>(output);
-        Console.WriteLine(output);
-        string json = "{\"empleado\" : { \"id\" : 1234}}";
-        Console.WriteLine(json);
-        
-
-        JObject employee = JObject.Parse(json);//Convierte json a employee
-        Console.WriteLine(employee.Properties().Select(p => p.Name).FirstOrDefault());
-
-
-        JToken results = employee["empleado"].First;//Obtiene el descendiente de empleado
-        Console.WriteLine("{" + results.ToString() + "}");
-        empleado Empleado = JsonConvert.DeserializeObject<empleado>("{" + results.ToString() + "}");//Lo parsea hacia empleado
-        Console.Write(Empleado.id);
-
-        Console.ReadKey();
+                // Close the ServiceHostBase to shutdown the service.
+                selfHost.Close();
+            }
+            catch (CommunicationException ce)
+            {
+                Console.WriteLine("An exception occurred: {0}", ce.Message);
+                selfHost.Abort();
+            }
 
     }
 }
