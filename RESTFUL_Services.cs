@@ -3,32 +3,31 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Web;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace RestWebService
 {
     public class Service:IHttpHandler
     {
-
-        private Company.Employee emp;
         private DatabaseConnection.Connection DBConnection;
         private string connString;
         private ErrorHandler.ErrorHandler errHandler;
 
-        bool IHttpHandler.IsReusable
-        {
+        //This called to determine whether this instance of the HTTP handler can be reused for fulfilling other requests of the same type
+        bool IHttpHandler.IsReusable{
             get { throw new NotImplementedException(); }
         }
 
+        //Handles requests calling the correct method
         void IHttpHandler.ProcessRequest(HttpContext context)
         {
             try
             {                
                 string url = Convert.ToString(context.Request.Url);                
-                connString = Properties.Settings.Default.ConnectionString;
-                DBConnection = new atabaseConnection.Connection();
+                DBConnection = new DatabaseConnection.Connection();
                 errHandler = new ErrorHandler.ErrorHandler();
 
                 //Handling CRUD
@@ -56,7 +55,6 @@ namespace RestWebService
             }
             catch (Exception ex)
             {
-                
                 errHandler.ErrorMessage = ex.Message.ToString();
                 context.Response.Write(errHandler.ErrorMessage);                
             }
@@ -73,27 +71,85 @@ namespace RestWebService
             //http://localhost/RestWebService/employee
             try
             {
-                int employeeCode = Convert.ToInt16(context.Request["id"]);
-                
+                string type = Convert.ToString(context.Request["object"]);
+                string id   = Convert.ToString(context.Request["id"]);
+
+                string Output;
                 //HTTP Request Type - GET"
                 //Performing Operation - READ"
                 //Data sent via query string
                 //POST - Data sent as name value pair and resides in the <form section> of the browser
-                emp = dal.GetEmployee(employeeCode);
-                if (emp==null)               
-                    context.Response.Write(employeeCode + "No Employee Found");                             
-                              
-                string serializedEmployee = Serialize(emp);                
-                context.Response.ContentType = "text/xml";
-                WriteResponse(serializedEmployee);
+                if (type.Equals("empleado"))
+                {
+                    Company.Empleado emp = DBConnection.get_Empleado(Int32.Parse(id));
+                    if (emp == null)
+                    {
+                        context.Response.Write(id + "Empleado no encontrado");
+                    }
+                    Output = JsonConvert.SerializeObject(emp);
+                }
+                else if (type.Equals("categoria"))
+                {
+                    Company.Categoria categoria = DBConnection.get_Categoria(id);
+                    if (categoria == null)
+                    {
+                        context.Response.Write(id + "Categoria no encontrada");
+                    }
+                    Output = JsonConvert.SerializeObject(categoria);
+                }
+                else if (type.Equals("pedido"))
+                {
+                    Company.Pedido pedido = DBConnection.get_Pedido(Int32.Parse(id));
+                    if (pedido == null)
+                    {
+                        context.Response.Write(id + "Pedido no encontrado");
+                    }
+                    Output = JsonConvert.SerializeObject(pedido);
+                }
+                else if (type.Equals("provedor"))
+                {
+                    Company.Proovedor provedor = DBConnection.get_Provedor(Int32.Parse(id));
+                    if (provedor == null)
+                    {
+                        context.Response.Write(id + "Provedor no encontrado");
+                    }
+                    Output = JsonConvert.SerializeObject(provedor);
+                }
+                else if (type.Equals("producto"))
+                {
+                    Company.Producto producto = DBConnection.get_Producto(id);
+                    if (producto == null)
+                    {
+                        context.Response.Write(id + "Empleado no encontrado");
+                    }
+                    Output = JsonConvert.SerializeObject(producto);
+                }
+                else if (type.Equals("cliente"))
+                {
+                    Company.Cliente cliente = DBConnection.get_Cliente(Int32.Parse(id));
+                    if (cliente == null)
+                    {
+                        context.Response.Write(id + "Empleado no encontrado");
+                    }
+                    Output = JsonConvert.SerializeObject(cliente);
+                }
+                else {
+                    context.Response.Write(type + "Tipo no soportado");
+                    Output = "";
+                }
+
+                context.Response.ContentType = "application/json";
+                WriteResponse(Output);
             }
             catch (Exception ex)
             {
                 WriteResponse("Error in READ");
-                errHandler.ErrorMessage = dal.GetException();
+                errHandler.ErrorMessage = DBConnection.GetException();
                 errHandler.ErrorMessage = ex.Message.ToString();                
             }            
         }
+        
+        
         /// <summary>
         /// POST Operation
         /// </summary>
@@ -102,42 +158,61 @@ namespace RestWebService
         {
             try
             {
-               
-                // HTTP POST sends name/value pairs to a web server
-                // dat is sent in message body
-
-                //The most common use of POST, by far, is to submit HTML form data to CGI scripts.
-                
-                // This Post task handles cookies and remembers them across calls. 
-                // This means that you can post to a login form, receive authentication cookies, 
-                // then subsequent posts will automatically pass the correct cookies. 
-                // The cookies are stored in memory only, they are not written to disk and 
-                // will cease to exist upon completion of the build.
-              
-                // The POST Request structure - Typical POST Request
-                // POST /path/script.cgi HTTP/1.0
-                // From: frog@jmarshall.com
-                // User-Agent: HTTPTool/1.0
-                // Content-Type: application/x-www-form-urlencoded
-                // Content-Length: 32
-
-                // home=Cosby&favorite+flavor=flies
-
                 // Extract the content of the Request and make a employee class
                 // The message body is posted as bytes. read the bytes
                 byte[] PostData = context.Request.BinaryRead(context.Request.ContentLength);
                 //Convert the bytes to string using Encoding class
-                string str = Encoding.UTF8.GetString(PostData);              
-                // deserialize xml into employee class
-                Company.Employee emp = Deserialize(PostData);                
-                // Insert data in database
-                dal.AddEmployee(emp);               
+                string str = Encoding.UTF8.GetString(PostData);
+
+                //Obtiene la primera llave, en este caso corresponde a el objeto a ser insertado
+                JObject employee = JObject.Parse(str);//Convierte json a employee
+                string tipo = employee.Properties().Select(p => p.Name).FirstOrDefault();
+
+
+
+
+                if (tipo.Equals("empleado"))
+                {
+                    JToken results = employee["empleado"].First;//Obtiene el descendiente de empleado
+                    Company.Empleado Empleado = JsonConvert.DeserializeObject<Company.Empleado>("{" + results.ToString() + "}");//Deserializa el dato a un objeto
+                    DBConnection.crear_Empleado(Empleado);
+                }
+                else if (tipo.Equals("categoria"))
+                {
+                    JToken results = employee["empleado"].First;//Obtiene el descendiente de empleado
+                    Company.Categoria categoria = JsonConvert.DeserializeObject<Company.Categoria>("{" + results.ToString() + "}");//Deserializa el dato a un objeto
+                    DBConnection.crear_Categoria(categoria);
+                }
+                else if (tipo.Equals("pedido"))
+                {
+                    JToken results = employee["empleado"].First;//Obtiene el descendiente de empleado
+                    Company.Pedido pedido = JsonConvert.DeserializeObject<Company.Pedido>("{" + results.ToString() + "}");//Deserializa el dato a un objeto
+                    DBConnection.crear_Pedido(pedido);
+                }
+                else if (tipo.Equals("provedor"))
+                {
+                    JToken results = employee["empleado"].First;//Obtiene el descendiente de empleado
+                    Company.Proovedor proovedor = JsonConvert.DeserializeObject<Company.Proovedor>("{" + results.ToString() + "}");//Deserializa el dato a un objeto
+                    DBConnection.crear_Empleado(proovedor);
+                }
+                else if (tipo.Equals("producto"))
+                {
+                    JToken results = employee["empleado"].First;//Obtiene el descendiente de empleado
+                    Company.Producto producto = JsonConvert.DeserializeObject<Company.Producto>("{" + results.ToString() + "}");//Deserializa el dato a un objeto
+                    DBConnection.crear_Empleado(producto);
+                }
+                else if (tipo.Equals("cliente"))
+                {
+                    JToken results = employee["empleado"].First;//Obtiene el descendiente de empleado
+                    Company.Cliente cliente = JsonConvert.DeserializeObject<Company.Cliente>("{" + results.ToString() + "}");//Deserializa el dato a un objeto
+                    DBConnection.crear_Empleado(cliente);
+                }
             }
-            catch (Exception ex)
-            {
+
+            catch (Exception ex){
 
                 WriteResponse("Error in CREATE");
-                errHandler.ErrorMessage = dal.GetException();
+                errHandler.ErrorMessage = DBConnection.GetException();
                 errHandler.ErrorMessage = ex.Message.ToString();                
             }
         }
@@ -148,27 +223,6 @@ namespace RestWebService
         private void UPDATE(HttpContext context)
         {
             //The PUT Method
-
-            // The PUT method requests that the enclosed entity be stored
-            // under the supplied URL. If the URL refers to an already 
-            // existing resource, the enclosed entity should be considered
-            // as a modified version of the one residing on the origin server. 
-            // If the URL does not point to an existing resource, and that 
-            // URL is capable of being defined as a new resource by the 
-            // requesting user agent, the origin server can create the 
-            // resource with that URL.
-            // If the request passes through a cache and the URL identifies 
-            // one or more currently cached entities, those entries should 
-            // be treated as stale. Responses to this method are not cacheable.
-
-
-            // Common Problems
-            // The PUT method is not widely supported on public servers 
-            // due to security concerns and generally FTP is used to 
-            // upload new and modified files to the webserver. 
-            // Before executing a PUT method on a URL, it may be worth 
-            // checking that PUT is supported using the OPTIONS method.
-            
             try
             {
                 // context.Response.Write("Update");
@@ -179,16 +233,16 @@ namespace RestWebService
                 context.Response.Write(PUTRequestByte);
 
                 // Deserialize Employee
-                Company.Employee emp = Deserialize(PUTRequestByte);
-                dal.UpdateEmployee(emp);
+                //Company.Employee emp = Deserialize(PUTRequestByte);
+                //DBConnection.UpdateEmployee(emp);
                 //context.Response.Write("Employee Updtated Sucessfully");
-                WriteResponse("Employee Updtated Sucessfully");
+                WriteResponse("Employee Updated Sucessfully");
             }
             catch (Exception ex)
             {
 
                 WriteResponse("Error in CREATE");
-                errHandler.ErrorMessage = dal.GetException();
+                errHandler.ErrorMessage = DBConnection.GetException();
                 errHandler.ErrorMessage = ex.Message.ToString();                
             }
         }
@@ -201,14 +255,14 @@ namespace RestWebService
             try
             {
                 int EmpCode = Convert.ToInt16(context.Request["id"]);
-                dal.DeleteEmployee(EmpCode);
+                //DBConnection.DeleteEmployee(EmpCode);
                 WriteResponse("Employee Deleted Successfully");
             }
             catch (Exception ex)
             {
                 
                 WriteResponse("Error in CREATE");
-                errHandler.ErrorMessage = dal.GetException();
+                errHandler.ErrorMessage = DBConnection.GetException();
                 errHandler.ErrorMessage = ex.Message.ToString();                
             }
         }
@@ -221,63 +275,6 @@ namespace RestWebService
         private static void WriteResponse(string strMessage)
         {
             HttpContext.Current.Response.Write(strMessage);            
-        }
-
-        /// <summary>
-        /// Method - Deserialize Class XML
-        /// </summary>
-        /// <param name="xmlByteData"></param>
-        /// <returns></returns>
-        private Company.Employee Deserialize(byte[] xmlByteData)
-        {
-            try
-            {
-                XmlSerializer ds = new XmlSerializer(typeof(Company.Employee));
-                MemoryStream memoryStream = new MemoryStream(xmlByteData);
-                Company.Employee emp = new Company.Employee();
-                emp = (Company.Employee)ds.Deserialize(memoryStream);
-                return emp;
-            }
-            catch (Exception ex)
-            {
-                
-                errHandler.ErrorMessage = dal.GetException();
-                errHandler.ErrorMessage = ex.Message.ToString();
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Method - Serialize Class to XML
-        /// </summary>
-        /// <param name="emp"></param>
-        /// <returns></returns>
-        private String Serialize(Company.Employee emp)
-        {
-            try
-            {
-                String XmlizedString = null;
-                XmlSerializer xs = new XmlSerializer(typeof(Company.Employee));
-                //create an instance of the MemoryStream class since we intend to keep the XML string 
-                //in memory instead of saving it to a file.
-                MemoryStream memoryStream = new MemoryStream();
-                //XmlTextWriter - fast, non-cached, forward-only way of generating streams or files 
-                //containing XML data
-                XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8);
-                //Serialize emp in the xmlTextWriter
-                xs.Serialize(xmlTextWriter, emp);
-                //Get the BaseStream of the xmlTextWriter in the Memory Stream
-                memoryStream = (MemoryStream)xmlTextWriter.BaseStream;
-                //Convert to array
-                XmlizedString = UTF8ByteArrayToString(memoryStream.ToArray());
-                return XmlizedString;
-            }
-            catch (Exception ex)
-            {
-                errHandler.ErrorMessage = ex.Message.ToString();
-                throw;
-            }           
-
         }
 
         /// <summary>
