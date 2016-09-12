@@ -1,9 +1,4 @@
-// Author - Anshu Dutta
-// Contact - anshu.dutta@gmail.com
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 //Contiene las clases para el manejo temporal de los datos en memoria
 namespace Company

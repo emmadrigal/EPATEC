@@ -3,8 +3,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.Xml;
-using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DatabaseConnection
 {
@@ -38,16 +36,16 @@ namespace DatabaseConnection
         }
 
         //Crea un nuevo cliente y lo agrega a la base de datos
-        public void crear_Cliente(int cedula, string nombre, string apellidos, string residencia, string fechaNacimiento, int telefono){
+        public void crear_Cliente(Company.Cliente cliente){
             SqlParameter[] myparm = new SqlParameter[6];
-            myparm[0] = new SqlParameter("@Cedula",          cedula);
-            myparm[1] = new SqlParameter("@Nombre",          nombre);
-            myparm[2] = new SqlParameter("@Apellidos",       apellidos);
-            myparm[3] = new SqlParameter("@Residencia",      residencia);   
+            myparm[0] = new SqlParameter("@Cedula",          cliente.Cedula_Cliente);
+            myparm[1] = new SqlParameter("@Nombre",          cliente.Nombre);
+            myparm[2] = new SqlParameter("@Apellidos",       cliente.Apellidos);
+            myparm[3] = new SqlParameter("@Residencia",      cliente.Residencia);   
             myparm[4] = new SqlParameter("@FechaNacimiento", SqlDbType.DateTime);
-            myparm[5] = new SqlParameter("@Telefono",        telefono);
+            myparm[5] = new SqlParameter("@Telefono",        cliente.Telefono);
 
-            myparm[4].Value = fechaNacimiento;//Agrega la fecha bajo el formato correcto
+            myparm[4].Value = cliente.Nacimiento;//Agrega la fecha bajo el formato correcto
 
             string command = "INSERT INTO CLIENTE (Cedula_Cliente, Nombre, Apellidos, Grado_de_Penalizacion, Lugar_de_Residencia, Fecha_de_Nacimiento, Telefono) VALUES (@Cedula, @Nombre, @Apellidos, 0, @Residencia, @FechaNacimiento, @Telefono); ";
 
@@ -156,15 +154,15 @@ namespace DatabaseConnection
         }
 
         //Crea un nuevo Proovedor y lo agrega a la base de datos
-        public void crear_Provedor(int cedula, string nombre, string apellidos, string fechaNacimiento, string residencia){
+        public void crear_Provedor(Company.Proovedor provedor){
             SqlParameter[] myparm = new SqlParameter[5];
-            myparm[0] = new SqlParameter("@Cedula",          cedula);
-            myparm[1] = new SqlParameter("@Nombre",          nombre);
-            myparm[2] = new SqlParameter("@Apellidos",       apellidos);
-            myparm[3] = new SqlParameter("@Residencia",      residencia);
+            myparm[0] = new SqlParameter("@Cedula",          provedor.Cedula_Proovedor);
+            myparm[1] = new SqlParameter("@Nombre",          provedor.Nombre);
+            myparm[2] = new SqlParameter("@Apellidos",       provedor.Apellidos);
+            myparm[3] = new SqlParameter("@Residencia",      provedor.Residencia);
             myparm[4] = new SqlParameter("@FechaNacimiento", SqlDbType.DateTime);
 
-            myparm[4].Value = fechaNacimiento;//Agrega la fecha bajo el formato correcto
+            myparm[4].Value = provedor.Nacimiento;//Agrega la fecha bajo el formato correcto
 
             string command = "INSERT INTO PROVEEDOR (Cedula_Proveedor, Nombre, Apellidos, Fecha_de_Nacimiento, Lugar_de_Residencia) VALUES (@Cedula, @Nombre, @Apellidos, @FechaNacimiento, @Residencia); ";
 
@@ -254,10 +252,10 @@ namespace DatabaseConnection
         }
 
         //Crea un nuevo Categoria y lo agrega a la base de datos
-        public void crear_Categoria(string nombre, string descripcion){
+        public void crear_Categoria(Company.Categoria categoria){
             SqlParameter[] myparm = new SqlParameter[2];
-            myparm[0] = new SqlParameter("@Descripcion", descripcion);
-            myparm[1] = new SqlParameter("@Nombre",      nombre);
+            myparm[0] = new SqlParameter("@Descripcion", categoria.Descripcion);
+            myparm[1] = new SqlParameter("@Nombre",      categoria.Nombre);
 
             string command = "INSERT INTO Categoria (Nombre, Descripción) VALUES (@Nombre, @Descripcion); ";
 
@@ -330,12 +328,12 @@ namespace DatabaseConnection
         }
 
         //Crea un nuevo Empleado y lo agrega a la base de datos
-        public void crear_Empleado(int id, string nombre, int Sucursal, byte puesto){
+        public void crear_Empleado(Company.Empleado empleado){
             SqlParameter[] myparm = new SqlParameter[4];
-            myparm[0] = new SqlParameter("@id", id);
-            myparm[1] = new SqlParameter("@Nombre",      nombre);
-            myparm[2] = new SqlParameter("@Sucursal", Sucursal);
-            myparm[3] = new SqlParameter("@Puesto",      puesto);
+            myparm[0] = new SqlParameter("@id",       empleado.id_Empleado);
+            myparm[1] = new SqlParameter("@Nombre",   empleado.Nombre);
+            myparm[2] = new SqlParameter("@Sucursal", empleado.id_Sucursal);
+            myparm[3] = new SqlParameter("@Puesto",   empleado.puesto);
 
             string command = "INSERT INTO EMPLEADO (Id_Empleado, Id_Sucursal, Nombre, Puesto) VALUES (@id, @Nombre, @Sucursal, @Puesto); ";
 
@@ -410,15 +408,15 @@ namespace DatabaseConnection
         }
 
         //Crea un nuevo Producto/Material y lo agrega a la base de datos
-        public void crear_Producto(int nombre, int sucursal, int proovedor, string categoria, string descripcion, bool exento, int cantidadDisponible){
+        public void crear_Producto(Company.Producto producto){
             SqlParameter[] myparm = new SqlParameter[6];
-            myparm[1] = new SqlParameter("@Nombre",      nombre);
-            myparm[0] = new SqlParameter("@Sucursal",    sucursal);
-            myparm[1] = new SqlParameter("@Proovedor",   proovedor);
-            myparm[2] = new SqlParameter("@Categoria",   categoria);
-            myparm[3] = new SqlParameter("@Descripcion", descripcion);
-            myparm[4] = new SqlParameter("@Exento",      exento);
-            myparm[5] = new SqlParameter("@Cantidad",    cantidadDisponible);
+            myparm[1] = new SqlParameter("@Nombre",      producto.nombre);
+            myparm[0] = new SqlParameter("@Sucursal",    producto.id_Sucursal);
+            myparm[1] = new SqlParameter("@Proovedor",   producto.Cedula_Provedor);
+            myparm[2] = new SqlParameter("@Categoria",   producto.categoria);
+            myparm[3] = new SqlParameter("@Descripcion", producto.Descripcion);
+            myparm[4] = new SqlParameter("@Exento",      producto.Exento);
+            myparm[5] = new SqlParameter("@Cantidad",    producto.Cantidad_Disponible);
 
             string command = "INSERT INTO PRODUCTO (Nombre_Producto, Id_Sucursal, Cedula_Proovedor, Nombre_Categoría, Descripción, Exento, Cantidad_Disponible) VALUES (@Nombre, @Sucursal, @Proovedor, @Categoria, @Descripcion, @Exento, @Cantidad); ";
 
@@ -497,75 +495,37 @@ namespace DatabaseConnection
 
 
         //Crea un nuevo Pedido y lo agrega a la base de datos
-        public void crear_Pedido(int cedula_Cliente, int sucursal, int telefono_Preferido, int hora,List<string> Productos){
+        public void crear_Pedido(Company.Pedido pedido){
             SqlParameter[] myparm = new SqlParameter[4];
-            myparm[0] = new SqlParameter("@Cedula",   cedula_Cliente);
-            myparm[1] = new SqlParameter("@Sucursal", sucursal);
-            myparm[2] = new SqlParameter("@Telefono", telefono_Preferido);
-            myparm[3] = new SqlParameter("@Hora",     hora);
+            myparm[0] = new SqlParameter("@Cedula",   pedido.Cedula_Cliente);
+            myparm[1] = new SqlParameter("@Sucursal", pedido.id_Sucursal);
+            myparm[2] = new SqlParameter("@Telefono", pedido.Telefono);
+            myparm[3] = new SqlParameter("@Hora",     pedido.Hora);
 
             string command = "INSERT INTO PEDIDO (Cedula_Cliente, Id_Sucursal, Telefono_Preferido, Hora_de_Creacion) VALUES (@Cedula, @Sucursal, @Telefono, @Hora); ";
 
             ExecuteCommandWrite(command, myparm);
+
+            string comandoid = "SELECT * FROM PEDIDO WHERE Cedula_Cliente = @Cedula AND Id_Sucursal = @Sucursal AND Telefono_Preferido = @Telefono AND Hora_de_Creacion = @Hora;";
+            SqlCommand commandID = new SqlCommand(comandoid, myConnection);
+            commandID.Parameters.Add(myparm);
+            SqlDataReader reader = commandID.ExecuteReader();
+            int id = (int) reader["Id_Pedido"];
+
 
 
             string command_Productos = "INSERT INTO CONTIENE (Nombre_Producto, Id_Pedido) VALUES (@Producto, @Pedido); ";
             SqlCommand comando = new SqlCommand  (command_Productos, myConnection);
             comando.Parameters.Add("@Pedido", SqlDbType.Int);
             comando.Parameters.Add("@Producto", SqlDbType.NVarChar);
-            foreach (string producto in Productos){
-                comando.Parameters["@Producto"].Value = producto;
+            
+
+            comando.Parameters["@Pedido"].Value = id;
+
+            foreach (Company.Producto producto in pedido.productos)
+            {
+                comando.Parameters["@Producto"].Value = producto.nombre;
                 comando.ExecuteNonQuery();    
-            }
-        }
-
-        public Company.Pedido get_Pedido(int id){
-            SqlParameter myparm = new SqlParameter("@id", id);
-
-            string command = "SELECT * FROM PEDIDO WHERE Id_Pedido = @id;";
-            using(myConnection = new SqlConnection(connectionString)){
-                myConnection.Open();
-                
-                using(SqlCommand comando = new SqlCommand(command, myConnection)){
-                    comando.Parameters.Add(myparm);
-                    using(SqlDataReader reader = comando.ExecuteReader())
-                    {
-                            if (reader.Read()){
-
-                                Company.Pedido pedido = new Company.Pedido();
-                                pedido.id_Pedido      = (int) reader["Id_Pedido"];
-                                pedido.Cedula_Cliente = (int)    reader["Cedula_Cliente"];
-                                pedido.id_Sucursal    = (int)    reader["Id_Sucursal"];
-                                pedido.Telefono       = (string) reader["Telefono_Preferido"];
-                                pedido.Hora           = (string) reader["Hora_de_Creacion"];
-
-                                command = "SELECT PRODUCTO.Nombre_Producto PRODUCTO.Descripción FROM PRODUCTO JOIN CONTIENE ON PRODUCTO.Nombre_Producto = CONTIENE.Nombre_Producto JOIN PEDIDO ON CONTIENE.Id_Pedido = PEDIDO.Id_Pedido WHERE PEDIDO.Id_Pedido = @id;";
-
-                                using(SqlCommand comando2 = new SqlCommand(command, myConnection)){
-                                    comando2.Parameters.Add(myparm);
-                                    using(SqlDataReader reader2 = comando2.ExecuteReader())
-                                    {
-                                            Company.Producto producto;
-                                            if (reader2.HasRows){
-                                                while (reader.Read()){
-                                                    producto = new Company.Producto();
-                                                    producto.nombre = (string )reader["Nombre_Producto"];
-                                                    pedido.productos.Add(producto);
-                                                    
-                                                }
-                                            }
-                                            else{
-                                                return null;
-                                        }
-                                    }
-                                }
-                                return pedido;
-                            }
-                        else{
-                            return null;
-                        }
-                    }
-                }
             }
         }
 
@@ -623,28 +583,28 @@ namespace DatabaseConnection
             SqlParameter myparm = new SqlParameter("@cedula", cedula);
 
             string command = "SELECT * FROM PEDIDO WHERE Cedula_Cliente = @cedula;";
-            List<Company.Pedido> Productos;
+            
 
             using(myConnection = new SqlConnection(connectionString)){
                 myConnection.Open();
                 
                 using(SqlCommand comando = new SqlCommand(command, myConnection)){
                     comando.Parameters.Add(myparm);
-                    using(SqlDataReader reader = comando.ExecuteReader())
-                    {
-                            Company.Pedido pedido;
-                            if (reader.Read()){
-                                while (reader.Read()){
-                                    pedido = new Company.Pedido();
-                                    pedido.id_Pedido      = (int) reader["Id_Pedido"];
-                                    pedido.Cedula_Cliente = (int)    reader["Cedula_Cliente"];
-                                    pedido.id_Sucursal    = (int)    reader["Id_Sucursal"];
-                                    pedido.Telefono       = (string) reader["Telefono_Preferido"];
-                                    pedido.Hora           = (string) reader["Hora_de_Creacion"];
-                                    Productos.Add(producto);
-                                }
-
-                                return Productos;
+                    using(SqlDataReader reader = comando.ExecuteReader()){
+                        Company.Pedido pedido;
+                        if (reader.Read()) {
+                            List<Company.Pedido> Productos = new List<Company.Pedido>();
+                            while (reader.Read()) {
+                                pedido = new Company.Pedido();
+                                pedido.id_Pedido = (int)reader["Id_Pedido"];
+                                pedido.Cedula_Cliente = (int)reader["Cedula_Cliente"];
+                                pedido.id_Sucursal = (int)reader["Id_Sucursal"];
+                                pedido.Telefono = (string)reader["Telefono_Preferido"];
+                                pedido.Hora = (string)reader["Hora_de_Creacion"];
+                                Productos.Add(pedido);
+                            }
+                            return Productos;
+                        }
                         else{
                             return null;
                         }

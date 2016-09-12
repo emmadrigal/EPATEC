@@ -1,22 +1,9 @@
 using System;
-using System.Xml;
-using System.Windows.Forms;
-using System.Data.SqlClient;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Linq;
+using System.ServiceModel;
+using System.ServiceModel.Description;
+using SelfHostedService;
 
-class piece{
-    public string name;
-    public int size;
-}
-
-class Product{
-    public string Name;
-    public int Price;
-    public List<piece> pieces;
-}
 
 class principal {
       static void Main(){
