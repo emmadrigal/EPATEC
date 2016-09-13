@@ -150,7 +150,7 @@ namespace Company
         { }
 
         /// Propiedad de Cedula
-        public long Cedula_Proovedor
+        public long Cedula_Proveedor
         {
             get { return cedula_Provedor; }
             set { cedula_Provedor = value; }

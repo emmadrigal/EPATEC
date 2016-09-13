@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -50,7 +51,7 @@ class principal
                 {
                     response = servicio.get_Empleado(context.Request.Url.Segments[2]);
                 }
-                else if (type == "Provedor/")
+                else if (type == "Proveedor/")
                 {
                     response = servicio.get_Provedor(context.Request.Url.Segments[2]);
                 }
@@ -75,9 +76,11 @@ class principal
             }
             else if (method == "POST")
             {
+                
                 string type = context.Request.Url.Segments[1];
                 if (type == "Cliente/")
                 {
+
                     servicio.crear_Cliente(context.Request.Url.Segments[2]);
                 }
                 else if (type == "Producto/")
@@ -92,7 +95,7 @@ class principal
                 {
                     servicio.crear_Empleado(context.Request.Url.Segments[2]);
                 }
-                else if (type == "Provedor/")
+                else if (type == "Proveedor/")
                 {
                     servicio.crear_Provedor(context.Request.Url.Segments[2]);
                 }
@@ -134,27 +137,27 @@ class principal
                 string type = context.Request.Url.Segments[1];
                 if (type == "Cliente/")
                 {
-                    servicio.eliminar_Cliente(context.Request.Url.Segments[1]);
+                    servicio.eliminar_Cliente(context.Request.Url.Segments[2]);
                 }
                 else if (type == "Producto/")
                 {
-                    servicio.eliminar_Producto(context.Request.Url.Segments[1]);
+                    servicio.eliminar_Producto(context.Request.Url.Segments[2]);
                 }
                 else if (type == "Categoria/")
                 {
-                    servicio.eliminar_Categoria(context.Request.Url.Segments[1]);
+                    servicio.eliminar_Categoria(context.Request.Url.Segments[2]);
                 }
                 else if (type == "Empleado/")
                 {
-                    servicio.eliminar_Empleado(context.Request.Url.Segments[1]);
+                    servicio.eliminar_Empleado(context.Request.Url.Segments[2]);
                 }
                 else if (type == "Provedor/")
                 {
-                    servicio.eliminar_Proovedor(context.Request.Url.Segments[1]);
+                    servicio.eliminar_Proovedor(context.Request.Url.Segments[2]);
                 }
                 else if (type == "Pedido/")
                 {
-                    servicio.eliminar_Pedido(context.Request.Url.Segments[1], context.Request.Url.Segments[1]);
+                    servicio.eliminar_Pedido(context.Request.Url.Segments[2], context.Request.Url.Segments[3]);
                 }
             }
             else
