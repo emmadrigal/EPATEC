@@ -1,0 +1,57 @@
+<div class="header center">
+	<div>
+		<button class="button button1" ng-click="goTo()">Clients</button>
+		<button class="button button1" ng-click="goTo()">Suppliers</button>
+		<button class="button button1" ng-click="goTo()">Products</button>
+		<button class="button button1" ng-click="goTo()">Orders</button>
+		<button class="button button1" ng-click="goTo('/login')">Categories</button>
+	</div>
+</div>
+<div class="content center">
+	<div>
+		<table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+			    <th>Name</th>
+			    <th>Last Name</th>
+			    <th>Address</th>
+			    <th>Phone Number</th>
+			    <th>Birthday</th>
+            </tr>
+        </thead>
+        <tbody>
+        	<tr ng-repeat="cust in customers" ng-class="{'selected':$index == selectedRow}" ng-click="setClickedRow($index)">
+				<td>{{cust.ID}}</td>
+			    <td>{{cust.name}}</td>
+			    <td>{{cust.lastName}}</td>
+			    <td>{{cust.address}}</td>
+			    <td>{{cust.phoneNumber}}</td>
+			    <td>{{cust.birthday}}</td>
+			</tr>
+        </tbody>
+   	</table>
+	</div>
+</div>
+<div class="center">
+	<div>
+		<button class="button button1" ng-click="update()">Update</button>
+		<button class="button button1" ng-click="eliminateRow()">Eliminate</button>
+	</div>
+</div>
+<div class="content center">
+	<div>
+		<input type="number" class="form-control" placeholder="ID" ng-model="newCustomer.id" ng-init="newCustomer.id=null"><br>
+		<input type="text" class="form-control" placeholder="Name" ng-model="newCustomer.name" ng-init="newCustomer.name=null"><br>
+	    <input type="text" class="form-control" placeholder="Last Name" ng-model="newCustomer.lName" ng-init="newCustomer.lName=null"><br>
+	    <input type="text" class="form-control" placeholder="Address" ng-model="newCustomer.address" ng-init="newCustomer.address=null"><br>
+	    <input type="number" class="form-control" placeholder="Phone Number" ng-model="newCustomer.pNumber" ng-init="newCustomer.pNumber=null">
+	    <h2>Birthday</h2> 	    
+	    <input type="text" class="form-control" placeholder="Day-Month-Year" ng-model="newCustomer.birthday" ng-init="newCustomer.birthday=null">
+	    <br>
+	</div>
+</div>
+<div class="center"> 
+	<button class="button button1" ng-click="addNew()">Update/New</button>
+</div>
+

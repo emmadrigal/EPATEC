@@ -1,0 +1,139 @@
+body {
+    background-image: url("/images/tool-background.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+h1 {
+    color: white;
+    font-family: 'Comic Sans MS"';
+    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 25px;
+}
+
+h2 {
+	color: black;
+	font-family: 'Comic Sans MS"';
+	font-size: 18px;
+}
+
+.header {
+	color: white;
+	width: auto;
+	height: 85px;
+	background: rgba(0, 0, 0, 0.9);
+}
+
+.center {
+	display: flex;
+  	justify-content: center;
+  	align-items: center;
+}
+
+.left{
+	display:flex;
+	align-items:center;
+}
+
+.right: {
+	display:flex;
+	justify-content:flex-end;
+	align-items:center;
+}
+
+.content {
+	border-radius: 25px;
+    width: auto;
+    background: rgba(255, 255, 255, 0.7);
+    height: auto;
+    margin: 20px auto;
+}
+
+input[type=text] {
+    width: 100%;
+    padding: 10px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #555555;
+    border-radius: 4px;
+}
+
+input[type=password] {
+    width: 100%;
+    padding: 10px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #555555;
+    border-radius: 4px;
+} 
+
+input[type=number] {
+    width: 100%;
+    padding: 10px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #555555;
+    border-radius: 4px;
+} 
+
+.button {
+    border-radius: 5px;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.button1 {
+    background-color: #555555;
+    color: white;
+    border: 2px solid #555555;
+}
+
+.button1:hover {
+    background-color: transparent;
+    color: black;
+}
+
+.button2 {
+    background-color: #555555;
+    color: white;
+    border: 2px solid #555555;
+}
+
+.button2:hover {
+    background-color: transparent;
+    color: white;
+}
+
+.footer {
+
+}
+
+.selected {
+    background-color:black;
+    color:white;
+    font-weight:bold;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover{
+	background-color: green;
+}
