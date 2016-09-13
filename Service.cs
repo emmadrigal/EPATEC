@@ -1,15 +1,16 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
 namespace Service
-{	
+{
     public class Service
     {
         //Function of the GET methods
-        public string get_Cliente(string id){
+        public string get_Cliente(string id)
+        {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            Company.Cliente cliente = DBConnection.get_Cliente(Int32.Parse(id));
+                        Company.Cliente cliente = DBConnection.get_Cliente(Int32.Parse(id));
             if (cliente == null)
             {
                 return "Empleado no encontrado";
@@ -17,13 +18,15 @@ namespace Service
             return JsonConvert.SerializeObject(cliente);
         }
 
-        public string get_Producto(string id){
+        public string get_Producto(string id)
+        {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
             Company.Producto producto = DBConnection.get_Producto(id);
             if (producto == null)
             {
                 return "Empleado no encontrado";
             }
+            return id + "Producto";
             return JsonConvert.SerializeObject(producto);
         }
 
@@ -31,10 +34,12 @@ namespace Service
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
             Company.Categoria categoria = DBConnection.get_Categoria(id);
+            
             if (categoria == null)
             {
                 return "Categoria no encontrada";
             }
+            
             string Output = JsonConvert.SerializeObject(categoria);
             return Output;
         }
@@ -49,6 +54,7 @@ namespace Service
             }
             string Output = JsonConvert.SerializeObject(emp);
             return Output;
+
         }
 
         public string get_Provedor(string id)
@@ -85,7 +91,6 @@ namespace Service
         }
 
         //Function of the POST methods
-        /*
         public void crear_Cliente(string json)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
@@ -127,28 +132,34 @@ namespace Service
             Company.Pedido pedido = JsonConvert.DeserializeObject<Company.Pedido>(json);//Deserializa el dato a un objeto
             DBConnection.crear_Pedido(pedido);
         }
-        */
+        
 
         //Function of the PUT methods
         public void update_Cliente(string id, string campo, string newvalue)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            if (campo == "nombre"){
+            if (campo == "nombre")
+            {
                 DBConnection.update_Nombre_Cliente(Int32.Parse(id), newvalue);
             }
-            else if (campo == "apellido"){
+            else if (campo == "apellido")
+            {
                 DBConnection.update_Apellido_Cliente(Int32.Parse(id), newvalue);
             }
-            else if (campo == "penalizacion"){
+            else if (campo == "penalizacion")
+            {
                 DBConnection.update_Penalizacion_Cliente(Int32.Parse(id), Byte.Parse(id));
             }
-            else if (campo == "residencia"){
+            else if (campo == "residencia")
+            {
                 DBConnection.update_Residencia_Cliente(Int32.Parse(id), newvalue);
             }
-            else if (campo == "nacimiento"){
+            else if (campo == "nacimiento")
+            {
                 DBConnection.update_Nacimiento_Cliente(Int32.Parse(id), newvalue);
             }
-            else if (campo == "telefono"){
+            else if (campo == "telefono")
+            {
                 DBConnection.update_Telefono_Cliente(Int32.Parse(id), Int32.Parse(newvalue));
             }
         }
@@ -156,13 +167,16 @@ namespace Service
         public void update_Producto(string id, string campo, string newvalue)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            if (campo == "nombre"){
+            if (campo == "nombre")
+            {
                 DBConnection.update_Nombre_Producto(Int32.Parse(id), newvalue);
             }
-            else if(campo == "descripcion"){
+            else if (campo == "descripcion")
+            {
                 DBConnection.update_Descripcion_Producto(Int32.Parse(id), newvalue);
             }
-            else if(campo == "cantidad"){
+            else if (campo == "cantidad")
+            {
                 DBConnection.update_Cantidad_Producto(Int32.Parse(id), Int32.Parse(newvalue));
             }
         }
@@ -170,7 +184,8 @@ namespace Service
         public void update_Categoria(string id, string campo, string newvalue)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            if (campo == "descripcion"){
+            if (campo == "descripcion")
+            {
                 DBConnection.update_Descripcion_Categoria(id, newvalue);
             }
         }
@@ -178,13 +193,16 @@ namespace Service
         public void update_Empleado(string id, string campo, string newvalue)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            if (campo == "nombre"){
+            if (campo == "nombre")
+            {
                 DBConnection.update_Nombre_Empleado(Int32.Parse(id), newvalue);
             }
-            else if(campo == "sucursal"){
+            else if (campo == "sucursal")
+            {
                 DBConnection.update_Sucursal_Empleado(Int32.Parse(id), newvalue);
             }
-            else if(campo == "puesto"){
+            else if (campo == "puesto")
+            {
                 DBConnection.update_Puesto_Empleado(Int32.Parse(id), newvalue);
             }
         }
@@ -192,21 +210,26 @@ namespace Service
         public void update_Provedor(string id, string campo, string newvalue)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            if (campo == "nombre"){
+            if (campo == "nombre")
+            {
                 DBConnection.update_Nombre_Proovedor(Int32.Parse(id), newvalue);
             }
-            else if(campo == "apellidos"){
+            else if (campo == "apellidos")
+            {
                 DBConnection.update_Apellidos_Proovedor(Int32.Parse(id), newvalue);
             }
-            else if(campo == "nacimiento"){
+            else if (campo == "nacimiento")
+            {
                 DBConnection.update_Nacimiento_Proovedor(Int32.Parse(id), newvalue);
             }
-            else if(campo == "residencia"){
+            else if (campo == "residencia")
+            {
                 DBConnection.update_Residencia_Proovedor(Int32.Parse(id), newvalue);
             }
         }
 
-        public void update_Pedido(string id, string campo, string newvalue){
+        public void update_Pedido(string id, string campo, string newvalue)
+        {
             //No hay metodo implementado para cambiar los datos de un pedido
         }
 
@@ -248,8 +271,7 @@ namespace Service
             DBConnection.eliminar_Pedido(Int32.Parse(id), Int32.Parse(hora));
         }
 
-
     }
-	
-	
+
+
 }

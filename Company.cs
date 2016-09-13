@@ -1,66 +1,75 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 //Contiene las clases para el manejo temporal de los datos en memoria
 namespace Company
 {
-    public class Cliente {
+    public class Cliente
+    {
 
-        private long   cedula_Cliente;
+        private long cedula_Cliente;
         private string nombre;
         private string apellidos;
         private int penalizacion;
         private string residencia;
         private string nacimiento;
-        private string    telefono;
+        private string telefono;
 
         /// Propiedad de Cedula
-        public long Cedula_Cliente{
+        public long Cedula_Cliente
+        {
             get { return cedula_Cliente; }
             set { cedula_Cliente = value; }
         }
 
         /// Propiedad de Nombre
-        public string Nombre{
+        public string Nombre
+        {
             get { return nombre; }
             set { nombre = value; }
         }
 
         /// Propiedad de Apellidos
-        public string Apellidos{
+        public string Apellidos
+        {
             get { return apellidos; }
             set { apellidos = value; }
         }
 
         /// Propiedad de Nombre
-        public int Penalizacion{
+        public int Penalizacion
+        {
             get { return penalizacion; }
             set { penalizacion = value; }
         }
 
         /// Propiedad de Nombre
-        public string Residencia{
+        public string Residencia
+        {
             get { return residencia; }
             set { residencia = value; }
         }
 
         /// Propiedad de Nombre
-        public string Nacimiento{
+        public string Nacimiento
+        {
             get { return nacimiento; }
             set { nacimiento = value; }
         }
 
         /// Propiedad de Nombre
-        public string Telefono{
+        public string Telefono
+        {
             get { return telefono; }
             set { telefono = value; }
         }
 
     }
 
-    public class Sucursal{
+    public class Sucursal
+    {
 
         private int Id;
-        
+
         public Sucursal()
         { }
 
@@ -72,7 +81,8 @@ namespace Company
         }
     }
 
-    public class Producto{
+    public class Producto
+    {
         private string Nombre;
         private int sucursal;
         private int cedula_Provedor;
@@ -128,7 +138,8 @@ namespace Company
 
     }
 
-    public class Proovedor {
+    public class Proovedor
+    {
         private long cedula_Provedor;
         private string nombre;
         private string apellidos;
@@ -175,9 +186,10 @@ namespace Company
 
     }
 
-    public class Pedido {
+    public class Pedido
+    {
         private int id;
-        private int cedula; 
+        private int cedula;
         private int sucursal;
         private string telefono;
         private string hora;
@@ -185,74 +197,86 @@ namespace Company
 
 
         /// Propiedad de Cedula
-        public int id_Pedido {
+        public int id_Pedido
+        {
             get { return id; }
             set { id = value; }
         }
-        
+
         /// Propiedad de Nombre
-        public int Cedula_Cliente{
+        public int Cedula_Cliente
+        {
             get { return cedula; }
             set { cedula = value; }
         }
 
         /// Propiedad de Apellidos
-        public int id_Sucursal{
+        public int id_Sucursal
+        {
             get { return sucursal; }
             set { sucursal = value; }
         }
 
         /// Propiedad de Nombre
-        public string Telefono{
+        public string Telefono
+        {
             get { return telefono; }
             set { telefono = value; }
         }
 
         /// Propiedad de Nombre
-        public string Hora{
+        public string Hora
+        {
             get { return hora; }
             set { hora = value; }
         }
 
-        public List<Producto> productos{
+        public List<Producto> productos
+        {
             get { return Productos; }
             set { Productos = value; }
         }
 
     }
 
-    public class Empleado{
+    public class Empleado
+    {
         private int id;
         private int sucursal;
         private string nombre;
         private string Puesto;
 
         /// Propiedad de id
-        public int id_Empleado{
+        public int id_Empleado
+        {
             get { return id; }
             set { id = value; }
         }
 
         /// Propiedad de id
-        public int id_Sucursal{
+        public int id_Sucursal
+        {
             get { return sucursal; }
             set { sucursal = value; }
         }
 
         /// Propiedad de id
-        public string Nombre{
+        public string Nombre
+        {
             get { return nombre; }
             set { nombre = value; }
         }
 
         /// Propiedad de id
-        public string puesto{
+        public string puesto
+        {
             get { return Puesto; }
             set { Puesto = value; }
         }
     }
 
-    public class Categoria{
+    public class Categoria
+    {
         private string nombre;
         private string descripcion;
 

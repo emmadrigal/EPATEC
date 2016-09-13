@@ -1,6 +1,4 @@
-// Author - Anshu Dutta
-// Contact - anshu.dutta@gmail.com
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +20,7 @@ namespace ErrorHandler
         /// </summary>
         public string ErrorMessage
         {
-            get {return errMessage.ToString();}
+            get { return errMessage.ToString(); }
             set
             {
                 errMessage.AppendLine(value);
