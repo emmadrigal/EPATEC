@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.Xml;
+using Company;
 
 namespace DatabaseConnection
 {
@@ -91,6 +92,226 @@ namespace DatabaseConnection
             }
         }
 
+        internal List<Producto> get_AllProductsProv(string provedor)
+        {
+            string command = "SELECT * FROM PRODUCTO WHERE PRODUCTO.Cedula_Provedor = @cedula;";
+            SqlParameter param = new SqlParameter("@cedula", provedor);
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    comando.Parameters.Add(param);
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.Producto producto;
+                        if (reader.HasRows)
+                        {
+                            List<Company.Producto> Productos = new List<Company.Producto>();
+                            while (reader.Read())
+                            {
+                                producto = new Company.Producto();
+                                producto.nombre = (string)reader["Nombre_Producto"];
+                                producto.Descripcion = (string)reader["Descripción"];
+                                producto.Cantidad_Disponible = (int)reader["Cantidad_Disponible"];
+                                producto.Exento = (int)reader["Exento"];
+                                Productos.Add(producto);
+                            }
+                            return Productos;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal List<ProductosVentas> get_TopProductos()
+        {
+            string command = "SELECT TOP(10) PRODUCTO.Nombre_Producto, PRODUCTO.Id_Sucursal, COUNT(CONTIENE.Nombre_Producto) AS 'Cuenta' FROM (PRODUCTO LEFT JOIN CONTIENE ON CONTIENE.Nombre_Producto = PRODUCTO.Nombre_Producto)  GROUP BY PRODUCTO.Nombre_Producto, PRODUCTO.Id_Sucursal";
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.ProductosVentas producto;
+                        if (reader.HasRows)
+                        {
+                            List<Company.ProductosVentas> Productos = new List<Company.ProductosVentas>();
+                            while (reader.Read())
+                            {
+                                producto = new Company.ProductosVentas();
+                                producto.Nombre = (string)reader["Nombre_Producto"];
+                                producto.Sucursal= (long)reader["Id_Sucursal"];
+                                producto.Cantidad = (int)reader["Cuenta"];
+                                Productos.Add(producto);
+                            }
+                            return Productos;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal List<Producto> get_AllProducsCat(string categoria)
+        {
+            string command = "SELECT * FROM PRODUCTO WHERE PRODUCTO.Nombre_Categoría = @nombre;";
+            SqlParameter param = new SqlParameter("@nombre", categoria);
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    comando.Parameters.Add(param);
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.Producto producto;
+                        if (reader.HasRows)
+                        {
+                            List<Company.Producto> Productos = new List<Company.Producto>();
+                            while (reader.Read())
+                            {
+                                producto = new Company.Producto();
+                                producto.nombre = (string)reader["Nombre_Producto"];
+                                producto.Descripcion = (string)reader["Descripción"];
+                                producto.Cantidad_Disponible = (int)reader["Cantidad_Disponible"];
+                                producto.Exento = (int)reader["Exento"];
+                                Productos.Add(producto);
+                            }
+                            return Productos;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal List<SucursalVentas> get_VentasSucursal(string sucursal)
+        {
+            string command = "SELECT SUCURSAL.Id_Sucursal, COUNT(PRODUCTO.Nombre_Producto) As Cuenta FROM SUCURSAL LEFT JOIN PRODUCTO ON PRODUCTO.Id_Sucursal = SUCURSAL.Id_Sucursal LEFT JOIN CONTIENE ON CONTIENE.Nombre_Producto = PRODUCTO.Nombre_Producto GROUP BY SUCURSAL.Id_Sucursal";
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.SucursalVentas Sucursal;
+                        if (reader.HasRows)
+                        {
+                            List<Company.SucursalVentas> Sucursales = new List<Company.SucursalVentas>();
+                            while (reader.Read())
+                            {
+                                Sucursal = new Company.SucursalVentas();
+                                Sucursal.Sucursal = (long)reader["Id_Sucursal"];
+                                Sucursal.CantVentas = (int)reader["Cuenta"];
+                                Sucursales.Add(Sucursal);
+                            }
+                            return Sucursales;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal List<ProductosVentas> get_TopProductosSuc(string sucursal)
+        {
+            string command = "SELECT TOP(10) PRODUCTO.Nombre_Producto, PRODUCTO.Id_Sucursal, COUNT(CONTIENE.Nombre_Producto) AS 'Cuenta' FROM (PRODUCTO LEFT JOIN CONTIENE ON CONTIENE.Nombre_Producto = PRODUCTO.Nombre_Producto) WHERE PRODUCTO.Id_Sucursal = @id  GROUP BY PRODUCTO.Nombre_Producto, PRODUCTO.Id_Sucursal;";
+
+            SqlParameter param = new SqlParameter("@id", sucursal);
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    comando.Parameters.Add(param);
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.ProductosVentas producto;
+                        if (reader.HasRows)
+                        {
+                            List<Company.ProductosVentas> Productos = new List<Company.ProductosVentas>();
+                            while (reader.Read())
+                            {
+                                producto = new Company.ProductosVentas();
+                                producto.Nombre = (string)reader["Nombre_Producto"];
+                                producto.Sucursal = (long)reader["Id_Sucursal"];
+                                producto.Cantidad = (int)reader["Cuenta"];
+                                Productos.Add(producto);
+                            }
+                            return Productos;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal List<Pedido> get_AllPedidosSuc(string sucursal)
+        {
+            string command = "SELECT * FROM PEDIDO WHERE PEDIDO.Id_Sucursal = @id;";
+            SqlParameter param = new SqlParameter("@id", sucursal);
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    comando.Parameters.Add(param);
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.Pedido pedido;
+                        if (reader.HasRows)
+                        {
+                            List<Company.Pedido> pedidos = new List<Company.Pedido>();
+                            while (reader.Read())
+                            {
+                                pedido = new Company.Pedido();
+                                pedido.id_Pedido = (long)reader["Id_Pedido"];
+                                pedido.Telefono = (string)reader["Telefono_Preferido"];
+                                pedido.Hora = ((DateTime)reader["Hora_de_Creación"]).ToString();
+                                pedidos.Add(pedido);
+                            }
+                            return pedidos;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
         public void update_Nombre_Cliente(int cedula, string nombre)
         {
             SqlParameter[] myparm = new SqlParameter[2];
@@ -162,6 +383,14 @@ namespace DatabaseConnection
         public void eliminar_Cliente(int cedula)
         {
             SqlParameter myparm = new SqlParameter("@Cedula", cedula);
+
+            string comando2 = "DELETE FROM CONTIENE JOIN PEDIDO ON CONTIENE.Id_Pedido = PEDIDO.Id_Pedido WHERE PEDIDO.Cedula_Cliente = @Cedula;";
+
+            ExecuteCommandWriteOneParam(comando2, myparm);
+
+            string comando3 = "DELETE FROM PEDIDO WHERE Cedula_Cliente = @Cedula;";
+
+            ExecuteCommandWriteOneParam(comando3, myparm);
 
             string command = "DELETE FROM CLIENTE WHERE Cedula_Cliente = @Cedula;";
 
@@ -270,11 +499,37 @@ namespace DatabaseConnection
         //Elimina un producto de la base de datos basado en su nombre
         public void eliminar_Proovedor(int cedula_Proovedor)
         {
-            SqlParameter cedula = new SqlParameter("@Cedula", cedula_Proovedor);
 
-            string command = "DELETE FROM PROVEEDOR WHERE Cedula_Proveedor = @Cedula;";
+            SqlParameter cedula1 = new SqlParameter("@Cedula", cedula_Proovedor);
+            string command = "SELECT COUNT(*) AS Cuenta FROM PRODUCTO WHERE PRODUCTO.Nombre_Producto = @Cedula;";
+            int cuenta;
 
-            ExecuteCommandWriteOneParam(command, cedula);
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    comando.Parameters.Add(cedula1);
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        if (reader.Read())
+                            cuenta = (int)reader["Cuenta"];
+                        else
+                            cuenta = 0;
+                    }
+                }
+            }
+
+            if (cuenta == 0)
+            {
+                SqlParameter cedula2 = new SqlParameter("@Cedula", cedula_Proovedor);
+
+                string command2 = "DELETE FROM PROVEEDOR WHERE Cedula_Proveedor = @Cedula;";
+
+                ExecuteCommandWriteOneParam(command2, cedula2);
+            }
+
         }
 
         //Crea un nuevo Categoria y lo agrega a la base de datos
@@ -337,10 +592,35 @@ namespace DatabaseConnection
         public void eliminar_Categoria(string Nombre)
         {
             SqlParameter nombre = new SqlParameter("@Nombre", Nombre);
+            int cuenta = 0;
 
-            string command = "DELETE FROM CATEGORIA WHERE Nombre = @Nombre;";
+            string command = "SELECT COUNT(*) AS Cuenta FROM PRODUCTO WHERE PRODUCTO.Nombre_Categoría = @Nombre;";
 
-            ExecuteCommandWriteOneParam(command, nombre);
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    comando.Parameters.Add(nombre);
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        if (reader.Read())
+                            cuenta = (int)reader["Cuenta"];
+                        else
+                            cuenta = 0;
+                    }
+                }
+            }
+
+            if (cuenta == 0)
+            {
+                SqlParameter nombre2 = new SqlParameter("@Nombre", Nombre);
+                string command2 = "DELETE FROM CATEGORIA WHERE Nombre = @Nombre;";
+
+                ExecuteCommandWriteOneParam(command2, nombre2);
+            }
+
         }
 
         //Crea una nueva sucursal y la agrega a la base de datos
@@ -393,7 +673,6 @@ namespace DatabaseConnection
                     {
                         if (reader.Read())
                         {
-
                             Company.Empleado empleado = new Company.Empleado();
                             empleado.id_Empleado = (int)reader["Id_Empleado"];
                             empleado.id_Sucursal = (int)reader["Id_Sucursal"];
@@ -456,16 +735,17 @@ namespace DatabaseConnection
         //Crea un nuevo Producto/Material y lo agrega a la base de datos
         public void crear_Producto(Company.Producto producto)
         {
-            SqlParameter[] myparm = new SqlParameter[6];
-            myparm[1] = new SqlParameter("@Nombre", producto.nombre);
-            myparm[0] = new SqlParameter("@Sucursal", producto.id_Sucursal);
-            myparm[1] = new SqlParameter("@Proovedor", producto.Cedula_Provedor);
-            myparm[2] = new SqlParameter("@Categoria", producto.categoria);
-            myparm[3] = new SqlParameter("@Descripcion", producto.Descripcion);
-            myparm[4] = new SqlParameter("@Exento", producto.Exento);
-            myparm[5] = new SqlParameter("@Cantidad", producto.Cantidad_Disponible);
+            SqlParameter[] myparm = new SqlParameter[7];
 
-            string command = "INSERT INTO PRODUCTO (Nombre_Producto, Id_Sucursal, Cedula_Proovedor, Nombre_Categoría, Descripción, Exento, Cantidad_Disponible) VALUES (@Nombre, @Sucursal, @Proovedor, @Categoria, @Descripcion, @Exento, @Cantidad); ";
+            myparm[0] = new SqlParameter("@Nombre", producto.nombre);
+            myparm[1] = new SqlParameter("@Sucursal", producto.id_Sucursal);
+            myparm[2] = new SqlParameter("@Proovedor", producto.Cedula_Provedor);
+            myparm[3] = new SqlParameter("@Categoria", producto.categoria);
+            myparm[4] = new SqlParameter("@Descripcion", producto.Descripcion);
+            myparm[5] = new SqlParameter("@Exento", producto.Exento);
+            myparm[6] = new SqlParameter("@Cantidad", producto.Cantidad_Disponible);
+
+            string command = "INSERT INTO PRODUCTO (Nombre_Producto, Id_Sucursal, Cedula_Provedor, Nombre_Categoría, Descripción, Exento, Cantidad_Disponible) VALUES (@Nombre, @Sucursal, @Proovedor, @Categoria, @Descripcion, @Exento, @Cantidad); ";
 
             ExecuteCommandWrite(command, myparm);
         }
@@ -486,11 +766,10 @@ namespace DatabaseConnection
                     {
                         if (reader.Read())
                         {
-
                             Company.Producto producto = new Company.Producto();
                             producto.nombre = (string)reader["Nombre_Producto"];
-                            producto.id_Sucursal = (int)reader["Id_Sucursal"];
-                            producto.Cedula_Provedor = (int)reader["Cedula_Provedor"];
+                            producto.id_Sucursal = (long)reader["Id_Sucursal"];
+                            producto.Cedula_Provedor = (long)reader["Cedula_Provedor"];
                             producto.categoria = (string)reader["Nombre_Categoría"];
                             producto.Descripcion = (string)reader["Descripción"];
                             producto.Exento = (int)reader["Exento"];
@@ -540,55 +819,91 @@ namespace DatabaseConnection
         }
 
         //Elimina un producto de la base de datos basado en su nombre
-        public void eliminar_Producto(int Nombre)
+        public void eliminar_Producto(string Nombre)
         {
             SqlParameter nombre = new SqlParameter("@Nombre", Nombre);
+            SqlParameter nombre2 = new SqlParameter("@Nombre", Nombre);
 
-            string command = "DELETE FROM PRODUCTO WHERE Nombre = @Nombre;";
+            string command2 = "DELETE FROM CONTIENE WHERE Nombre_Producto = @Nombre;";
 
-            ExecuteCommandWriteOneParam(command, nombre);
+            ExecuteCommandWriteOneParam(command2, nombre);
+
+            string command = "DELETE FROM PRODUCTO WHERE Nombre_Producto = @Nombre;";
+
+            ExecuteCommandWriteOneParam(command, nombre2);
         }
 
 
         //Crea un nuevo Pedido y lo agrega a la base de datos
         public void crear_Pedido(Company.Pedido pedido)
         {
+            string horaActual = DateTime.Now.ToString();
+            //Crea el nuevo pedidoi
             SqlParameter[] myparm = new SqlParameter[4];
             myparm[0] = new SqlParameter("@Cedula", pedido.Cedula_Cliente);
             myparm[1] = new SqlParameter("@Sucursal", pedido.id_Sucursal);
             myparm[2] = new SqlParameter("@Telefono", pedido.Telefono);
-            myparm[3] = new SqlParameter("@Hora", pedido.Hora);
+            myparm[3] = new SqlParameter("@Hora", horaActual);
 
             string command = "INSERT INTO PEDIDO (Cedula_Cliente, Id_Sucursal, Telefono_Preferido, Hora_de_Creación) VALUES (@Cedula, @Sucursal, @Telefono, @Hora); ";
 
             ExecuteCommandWrite(command, myparm);
 
-            string comandoid = "SELECT * FROM PEDIDO WHERE Cedula_Cliente = @Cedula AND Id_Sucursal = @Sucursal AND Telefono_Preferido = @Telefono AND Hora_de_Creación = @Hora;";
-            SqlCommand commandID = new SqlCommand(comandoid, myConnection);
-            commandID.Parameters.Add(myparm);
-            SqlDataReader reader = commandID.ExecuteReader();
-            int id = (int)reader["Id_Pedido"];
 
-
-
-            string command_Productos = "INSERT INTO CONTIENE (Nombre_Producto, Id_Pedido) VALUES (@Producto, @Pedido); ";
-            SqlCommand comando = new SqlCommand(command_Productos, myConnection);
-            comando.Parameters.Add("@Pedido", SqlDbType.Int);
-            comando.Parameters.Add("@Producto", SqlDbType.NVarChar);
-
-
-            comando.Parameters["@Pedido"].Value = id;
-
-            foreach (Company.Producto producto in pedido.productos)
+            using (myConnection = new SqlConnection(connectionString))
             {
-                comando.Parameters["@Producto"].Value = producto.nombre;
-                comando.ExecuteNonQuery();
+                myConnection.Open();
+                try
+                {
+                    //Obtiene el id creado por la base de datos
+                    SqlParameter[] myparm2 = new SqlParameter[2];
+                    myparm2[0] = new SqlParameter("@Cedula", pedido.Cedula_Cliente);
+                    myparm2[1] = new SqlParameter("@Hora", horaActual);
+
+                    string comandoid = "SELECT PEDIDO.Id_Pedido FROM PEDIDO WHERE Cedula_Cliente = @Cedula AND Hora_de_Creación = @Hora;";
+                    SqlCommand commandID = new SqlCommand(comandoid, myConnection);
+                    commandID.Parameters.AddRange(myparm2);
+                    long id = 0;
+
+                    using (SqlDataReader reader = commandID.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            id = (long)reader["Id_Pedido"];
+                        }
+                    }
+
+                    //Inserta cada uno de las relaciones entre Pedido y Producto que establece esto
+                    string command_Productos = "INSERT INTO CONTIENE (Nombre_Producto, Id_Pedido) VALUES (@Producto, @Pedido); ";
+                    SqlCommand comando = new SqlCommand(command_Productos, myConnection);
+                    comando.Parameters.Add("@Pedido", SqlDbType.BigInt);
+                    comando.Parameters.Add("@Producto", SqlDbType.NVarChar);
+
+                    foreach (Company.Producto producto in pedido.productos)
+                    {
+                        try
+                        {
+                            comando.Parameters["@Producto"].Value = producto.nombre;
+                            comando.Parameters["@Pedido"].Value = id;
+                            comando.ExecuteNonQuery();
+                        }
+                        catch (Exception ex)
+                        {
+                            err.ErrorMessage = ex.Message.ToString();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    err.ErrorMessage = ex.Message.ToString();
+                }
             }
         }
 
         public Company.Pedido get_Pedido(int id)
         {
             SqlParameter myparm = new SqlParameter("@id", id);
+            Company.Pedido pedido = new Company.Pedido();
 
             string command = "SELECT * FROM PEDIDO WHERE Id_Pedido = @id;";
             using (myConnection = new SqlConnection(connectionString))
@@ -602,39 +917,11 @@ namespace DatabaseConnection
                     {
                         if (reader.Read())
                         {
-
-                            Company.Pedido pedido = new Company.Pedido();
-                            pedido.id_Pedido = (int)reader["Id_Pedido"];
-                            pedido.Cedula_Cliente = (int)reader["Cedula_Cliente"];
-                            pedido.id_Sucursal = (int)reader["Id_Sucursal"];
+                            pedido.id_Pedido = (long)reader["Id_Pedido"];
+                            pedido.Cedula_Cliente = (long)reader["Cedula_Cliente"];
+                            pedido.id_Sucursal = (long)reader["Id_Sucursal"];
                             pedido.Telefono = (string)reader["Telefono_Preferido"];
-                            pedido.Hora = (string)reader["Hora_de_Creación"];
-
-                            command = "SELECT PRODUCTO.Nombre_Producto PRODUCTO.Descripción FROM PRODUCTO JOIN CONTIENE ON PRODUCTO.Nombre_Producto = CONTIENE.Nombre_Producto JOIN PEDIDO ON CONTIENE.Id_Pedido = PEDIDO.Id_Pedido WHERE PEDIDO.Id_Pedido = @id;";
-
-                            using (SqlCommand comando2 = new SqlCommand(command, myConnection))
-                            {
-                                comando2.Parameters.Add(myparm);
-                                using (SqlDataReader reader2 = comando2.ExecuteReader())
-                                {
-                                    Company.Producto producto;
-                                    if (reader2.HasRows)
-                                    {
-                                        while (reader.Read())
-                                        {
-                                            producto = new Company.Producto();
-                                            producto.nombre = (string)reader["Nombre_Producto"];
-                                            pedido.productos.Add(producto);
-
-                                        }
-                                    }
-                                    else
-                                    {
-                                        return null;
-                                    }
-                                }
-                            }
-                            return pedido;
+                            pedido.Hora = ((DateTime)reader["Hora_de_Creación"]).ToString();
                         }
                         else
                         {
@@ -643,6 +930,30 @@ namespace DatabaseConnection
                     }
                 }
             }
+            command = "SELECT PRODUCTO.Nombre_Producto, PRODUCTO.Descripción FROM PRODUCTO JOIN CONTIENE ON PRODUCTO.Nombre_Producto = CONTIENE.Nombre_Producto JOIN PEDIDO ON CONTIENE.Id_Pedido = PEDIDO.Id_Pedido WHERE PEDIDO.Id_Pedido = @id;";
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    SqlParameter myparm2 = new SqlParameter("@id", id);
+                    comando.Parameters.Add(myparm2);
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            pedido.productos = new List<Company.Producto>();
+                            if (reader.Read())
+                            {
+                                Company.Producto producto = new Company.Producto();
+                                producto.nombre = (string)reader["Nombre_Producto"];
+                                pedido.productos.Add(producto);
+                            }
+                        }
+                    }
+                }
+            }
+            return pedido;
         }
 
         public List<Company.Pedido> get_PedidoCliente(int cedula)
@@ -650,7 +961,6 @@ namespace DatabaseConnection
             SqlParameter myparm = new SqlParameter("@cedula", cedula);
 
             string command = "SELECT * FROM PEDIDO WHERE Cedula_Cliente = @cedula;";
-
 
             using (myConnection = new SqlConnection(connectionString))
             {
@@ -662,20 +972,45 @@ namespace DatabaseConnection
                     using (SqlDataReader reader = comando.ExecuteReader())
                     {
                         Company.Pedido pedido;
-                        if (reader.Read())
+                        if (reader.HasRows)
                         {
-                            List<Company.Pedido> Productos = new List<Company.Pedido>();
+                            List<Company.Pedido> PedidosCliente = new List<Company.Pedido>();
                             while (reader.Read())
                             {
                                 pedido = new Company.Pedido();
-                                pedido.id_Pedido = (int)reader["Id_Pedido"];
-                                pedido.Cedula_Cliente = (int)reader["Cedula_Cliente"];
-                                pedido.id_Sucursal = (int)reader["Id_Sucursal"];
+                                long id = (long)reader["Id_Pedido"];
+                                pedido.id_Pedido = id;
+                                pedido.Cedula_Cliente = (long)reader["Cedula_Cliente"];
+                                pedido.id_Sucursal = (long)reader["Id_Sucursal"];
                                 pedido.Telefono = (string)reader["Telefono_Preferido"];
-                                pedido.Hora = (string)reader["Hora_de_Creación"];
-                                Productos.Add(pedido);
+                                pedido.Hora = ((DateTime)reader["Hora_de_Creación"]).ToString();
+
+                                using (SqlConnection myConnection2 = new SqlConnection(connectionString))
+                                {
+                                    myConnection2.Open();
+                                    string command2 = "SELECT * FROM PRODUCTO JOIN CONTIENE ON PRODUCTO.Nombre_Producto = CONTIENE.Nombre_Producto WHERE CONTIENE.Id_Pedido = @id";
+                                    using (SqlCommand comando2 = new SqlCommand(command2, myConnection2))
+                                    {
+                                        comando2.Parameters.AddWithValue("@id", id);
+                                        using (SqlDataReader reader2 = comando2.ExecuteReader())
+                                        {
+                                            Company.Producto producto;
+                                            if (reader2.HasRows)
+                                            {
+                                                while (reader2.Read())
+                                                {
+                                                    producto = new Company.Producto();
+                                                    producto.nombre = (string)reader2["Nombre_Producto"];
+                                                    producto.Descripcion = (string)reader2["Descripción"];
+                                                    pedido.productos.Add(producto);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                PedidosCliente.Add(pedido);
                             }
-                            return Productos;
+                            return PedidosCliente;
                         }
                         else
                         {
@@ -686,7 +1021,8 @@ namespace DatabaseConnection
             }
         }
 
-        public List<Company.Cliente> get_AllCLientes()
+
+        public List<Company.Cliente> get_AllClientes()
         {
             string command = "SELECT * FROM CLIENTE;";
 
@@ -706,7 +1042,7 @@ namespace DatabaseConnection
                             while (reader.Read())
                             {
                                 cliente = new Company.Cliente();
-                                cliente.Cedula_Cliente = (int)reader["Cedula_Cliente"];
+                                cliente.Cedula_Cliente = (long)reader["Cedula_Cliente"];
                                 cliente.Nombre = (string)reader["Nombre"];
                                 cliente.Apellidos = (string)reader["Apellidos"];
                                 cliente.Residencia = (string)reader["Lugar_de_Residencia"];
@@ -728,7 +1064,7 @@ namespace DatabaseConnection
         public List<Company.Producto> get_AllProducts()
         {
 
-            string command = "SELECT * FROM PRODUCTO;";
+            string command = "SELECT * FROM PRODUCTO";
 
 
             using (myConnection = new SqlConnection(connectionString))
@@ -740,7 +1076,7 @@ namespace DatabaseConnection
                     using (SqlDataReader reader = comando.ExecuteReader())
                     {
                         Company.Producto producto;
-                        if (reader.Read())
+                        if (reader.HasRows)
                         {
                             List<Company.Producto> Productos = new List<Company.Producto>();
                             while (reader.Read())
@@ -748,7 +1084,7 @@ namespace DatabaseConnection
                                 producto = new Company.Producto();
                                 producto.nombre = (string)reader["Nombre_Producto"];
                                 producto.Cantidad_Disponible = (int)reader["Cantidad_Disponible"];
-                                producto.categoria= (string)reader["Nombre_Categoría"];
+                                producto.categoria = (string)reader["Nombre_Categoría"];
                                 Productos.Add(producto);
                             }
                             return Productos;
@@ -829,7 +1165,7 @@ namespace DatabaseConnection
                                 pedido.id_Pedido = (int)reader["Id_Pedido"];
                                 pedido.Cedula_Cliente = (int)reader["Cedula_Cliente"];
                                 pedido.Telefono = (string)reader["Telefono_Preferido"];
-                                pedido.Hora = (string)reader["Hora_de_Creación"];
+                                pedido.Hora = ((DateTime)reader["Hora_de_Creación"]).ToString();
                                 Productos.Add(pedido);
                             }
                             return Productos;
@@ -845,21 +1181,20 @@ namespace DatabaseConnection
 
 
         //Elimina un Pedido de la base de datos basado en el cliente que realizó el pedido y la hora
-        public void eliminar_Pedido(int cedula_Cliente, int hora)
+        public void eliminar_Pedido(int id)
         {
-            SqlParameter[] myparm = new SqlParameter[2];
-            myparm[0] = new SqlParameter("@Cliente", cedula_Cliente);
-            myparm[1] = new SqlParameter("@Hora", hora);
+            SqlParameter myparm = new SqlParameter("@id", id);
 
             //Elimina todas las solicitudes de producto relacionadas con este producto
-            string command_Productos = "DELETE FROM PEDIDO WHERE IdPedido = (SELECT Id_Pedido FROM PEDIDO WHERE Cedula_Cliente = @Cliente AND Hora_de_Creación = @Hora); ";
+            string command_Productos = "DELETE FROM CONTIENE WHERE Id_Pedido = @id;";
 
-            ExecuteCommandWrite(command_Productos, myparm);
+            ExecuteCommandWriteOneParam(command_Productos, myparm);
 
             //Elimina el Pedido indicado
-            string command = "DELETE FROM PEDIDO WHERE Cedula_Cliente = @Cliente AND Hora_de_Creación = @Hora;";
+            string command = "DELETE FROM PEDIDO WHERE PEDIDO.Id_Pedido = @id;";
+            SqlParameter myparm2 = new SqlParameter("@id", id);
 
-            ExecuteCommandWrite(command, myparm);
+            ExecuteCommandWriteOneParam(command, myparm2);
         }
 
         public void ExecuteCommandWrite(string command, SqlParameter[] parms)
@@ -877,7 +1212,6 @@ namespace DatabaseConnection
                 catch (Exception ex)
                 {
                     err.ErrorMessage = ex.Message.ToString();
-                    throw;
                 }
             }
 
@@ -899,7 +1233,6 @@ namespace DatabaseConnection
                 catch (Exception ex)
                 {
                     err.ErrorMessage = ex.Message.ToString();
-                    throw;
                 }
             }
         }

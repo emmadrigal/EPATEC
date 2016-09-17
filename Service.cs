@@ -13,12 +13,23 @@ namespace Service
         public string get_Cliente(string id)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-                        Company.Cliente cliente = DBConnection.get_Cliente(Int32.Parse(id));
+            Company.Cliente cliente = DBConnection.get_Cliente(Int32.Parse(id));
             if (cliente == null)
             {
                 return "Empleado no encontrado";
             }
             return JsonConvert.SerializeObject(cliente);
+        }
+
+        public string get_AllClients()
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.Cliente> clientes = DBConnection.get_AllClientes();
+            if (clientes == null)
+            {
+                return "No hay clientes en existencia";
+            }
+            return JsonConvert.SerializeObject(clientes);
         }
 
         public string get_Producto(string id)
@@ -29,7 +40,6 @@ namespace Service
             {
                 return "Empleado no encontrado";
             }
-            return id + "Producto";
             return JsonConvert.SerializeObject(producto);
         }
 
@@ -37,12 +47,12 @@ namespace Service
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
             Company.Categoria categoria = DBConnection.get_Categoria(id);
-            
+
             if (categoria == null)
             {
                 return "Categoria no encontrada";
             }
-            
+
             string Output = JsonConvert.SerializeObject(categoria);
             return Output;
         }
@@ -69,6 +79,83 @@ namespace Service
                 return "Provedor no encontrado";
             }
             return JsonConvert.SerializeObject(provedor);
+        }
+
+        internal string get_AllProductsCat(string v)
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.Producto> productos = DBConnection.get_AllProducsCat(v);
+            if (productos == null)
+            {
+                return "No hay productos en esta categoria";
+            }
+            return JsonConvert.SerializeObject(productos);
+        }
+
+        internal string get_TopPedidos()
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.ProductosVentas> productos = DBConnection.get_TopProductos();
+            if (productos == null)
+            {
+                return "No hay productos";
+            }
+            return JsonConvert.SerializeObject(productos);
+        }
+
+        internal string get_AllPedidosProv(string provedor)
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.Producto> productos = DBConnection.get_AllProductsProv(provedor);
+            if (productos == null)
+            {
+                return "No hay productos";
+            }
+            return JsonConvert.SerializeObject(productos);
+        }
+
+        internal string get_VentasSucursal(string sucursal)
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.SucursalVentas> productos = DBConnection.get_VentasSucursal(sucursal);
+            if (productos == null)
+            {
+                return "No hay productos";
+            }
+            return JsonConvert.SerializeObject(productos);
+        }
+
+        internal string getTopProductosSuc(string sucursal)
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.ProductosVentas> productos = DBConnection.get_TopProductosSuc(sucursal);
+            if (productos == null)
+            {
+                return "No hay productos";
+            }
+            return JsonConvert.SerializeObject(productos);
+        }
+
+        internal string get_AllProducts()
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.Producto> productos = DBConnection.get_AllProducts();
+            if (productos == null)
+            {
+                return "No hay productos";
+            }
+            return JsonConvert.SerializeObject(productos);
+        }
+
+        internal string get_AllPedidosSuc(string v)
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.Pedido> pedidos = DBConnection.get_AllPedidosSuc(v);
+            if (pedidos == null)
+            {
+                return "No hay pedidos en esta sucursal";
+            }
+            return JsonConvert.SerializeObject(pedidos);
         }
 
         public string get_Pedido(string id)
@@ -130,6 +217,7 @@ namespace Service
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
             json = HttpUtility.UrlDecode(json);
+
             Company.Proovedor provedor = JsonConvert.DeserializeObject<Company.Proovedor>(json);//Deserializa el dato a un objeto
             DBConnection.crear_Provedor(provedor);
         }
@@ -141,7 +229,7 @@ namespace Service
             Company.Pedido pedido = JsonConvert.DeserializeObject<Company.Pedido>(json);//Deserializa el dato a un objeto
             DBConnection.crear_Pedido(pedido);
         }
-        
+
 
         //Function of the PUT methods
         public void update_Cliente(string id, string campo, string newvalue)
@@ -251,7 +339,6 @@ namespace Service
         //Function of the DELETE methods
         public void eliminar_Cliente(string id)
         {
-            Console.Write(id);
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
             DBConnection.eliminar_Cliente(Int32.Parse(id));
         }
@@ -259,7 +346,7 @@ namespace Service
         public void eliminar_Producto(string id)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            DBConnection.eliminar_Producto(Int32.Parse(id));
+            DBConnection.eliminar_Producto(id);
         }
 
         public void eliminar_Categoria(string id)
@@ -280,10 +367,10 @@ namespace Service
             DBConnection.eliminar_Proovedor(Int32.Parse(id));
         }
 
-        public void eliminar_Pedido(string id, string hora)
+        public void eliminar_Pedido(string id)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            DBConnection.eliminar_Pedido(Int32.Parse(id), Int32.Parse(hora));
+            DBConnection.eliminar_Pedido(Int32.Parse(id));
         }
 
     }

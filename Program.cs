@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -11,7 +12,8 @@ class principal
         HttpListener listener = new HttpListener();
         listener.Prefixes.Add("http://localhost:21005/");
         listener.Start();
-        Console.WriteLine("Listening...");
+        string msg = "Listening on " + GetLocalIPAddress() + "...";
+        Console.WriteLine(msg);
         for (;;)
         {
             HttpListenerContext ctx = listener.GetContext();
@@ -19,7 +21,21 @@ class principal
         }
     }
 
-    public class Director
+
+    public static string GetLocalIPAddress()
+    {
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return ip.ToString();
+            }
+        }
+        throw new Exception("Local IP Address Not Found!");
+    }
+
+    public class Director 
     {
         private HttpListenerContext context;
         private Service.Service servicio = new Service.Service();
@@ -31,8 +47,7 @@ class principal
         {
             string method = context.Request.HttpMethod;
             if (method == "GET")
-            {
-                    
+            {       
                 string response;
                 string type = context.Request.Url.Segments[1];
                 if (type == "Cliente/")
@@ -63,6 +78,41 @@ class principal
                 {
                     response = servicio.get_PedidoCliente(context.Request.Url.Segments[2]);
                 }
+                else if (type == "getAllClients")
+                {
+                    response = servicio.get_AllClients();
+                }
+                else if (type == "getAllProducts")
+                {
+                    response = servicio.get_AllProducts();
+                }
+                else if (type == "getAllProductsCat/")
+                {
+                    response = servicio.get_AllProductsCat(context.Request.Url.Segments[2]);
+                }
+                else if (type == "getAllPedidosSuc/")
+                {
+                    response = servicio.get_AllPedidosSuc(context.Request.Url.Segments[2]);
+                }
+                else if (type == "getAllProductosProveedor/")
+                {
+                    response = servicio.get_AllPedidosProv(context.Request.Url.Segments[2]);
+                }
+                //Para el modulo de estadística
+                else if (type == "getProductosMasVendidos")
+                {
+                    response = servicio.get_TopPedidos();
+                }
+
+                else if (type == "getTopProductosSucursal/")
+                {
+                    response = servicio.getTopProductosSuc(context.Request.Url.Segments[2]);
+                }
+                else if (type == "getVentasSucursal/")
+                {
+                    response = servicio.get_VentasSucursal(context.Request.Url.Segments[2]);
+                }
+
                 else
                 {
                     response = "Objeto no identificado";
@@ -123,7 +173,7 @@ class principal
                 {
                     servicio.update_Empleado(context.Request.Url.Segments[2], context.Request.Url.Segments[3], context.Request.Url.Segments[4]);
                 }
-                else if (type == "Provedor/")
+                else if (type == "Proveedor/")
                 {
                     servicio.update_Provedor(context.Request.Url.Segments[2], context.Request.Url.Segments[3], context.Request.Url.Segments[4]);
                 }
@@ -151,13 +201,13 @@ class principal
                 {
                     servicio.eliminar_Empleado(context.Request.Url.Segments[2]);
                 }
-                else if (type == "Provedor/")
+                else if (type == "Proveedor/")
                 {
                     servicio.eliminar_Proovedor(context.Request.Url.Segments[2]);
                 }
                 else if (type == "Pedido/")
                 {
-                    servicio.eliminar_Pedido(context.Request.Url.Segments[2], context.Request.Url.Segments[3]);
+                    servicio.eliminar_Pedido(context.Request.Url.Segments[2]);
                 }
             }
             else

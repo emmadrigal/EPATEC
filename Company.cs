@@ -84,8 +84,8 @@ namespace Company
     public class Producto
     {
         private string Nombre;
-        private int sucursal;
-        private int cedula_Provedor;
+        private long sucursal;
+        private long cedula_Provedor;
         private string Categoria;
         private string descripcion;
         private int exento;
@@ -99,14 +99,14 @@ namespace Company
         }
 
         /// Propiedad de nombre
-        public int id_Sucursal
+        public long id_Sucursal
         {
             get { return sucursal; }
             set { sucursal = value; }
         }
 
         /// Propiedad de nombre
-        public int Cedula_Provedor
+        public long Cedula_Provedor
         {
             get { return cedula_Provedor; }
             set { cedula_Provedor = value; }
@@ -188,30 +188,30 @@ namespace Company
 
     public class Pedido
     {
-        private int id;
-        private int cedula;
-        private int sucursal;
+        private long id;
+        private long cedula;
+        private long sucursal;
         private string telefono;
         private string hora;
         private List<Producto> Productos;
 
 
         /// Propiedad de Cedula
-        public int id_Pedido
+        public long id_Pedido
         {
             get { return id; }
             set { id = value; }
         }
 
         /// Propiedad de Nombre
-        public int Cedula_Cliente
+        public long Cedula_Cliente
         {
             get { return cedula; }
             set { cedula = value; }
         }
 
         /// Propiedad de Apellidos
-        public int id_Sucursal
+        public long id_Sucursal
         {
             get { return sucursal; }
             set { sucursal = value; }
@@ -295,4 +295,16 @@ namespace Company
         }
     }
 
+    public class ProductosVentas
+    {
+        public string Nombre;
+        public long Sucursal;
+        public int Cantidad;
+    }
+
+    public class SucursalVentas
+    {
+        public long Sucursal;
+        public int CantVentas;
+    }
 }
