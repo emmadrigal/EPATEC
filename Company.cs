@@ -88,7 +88,7 @@ namespace Company
         private long cedula_Provedor;
         private string Categoria;
         private string descripcion;
-        private int exento;
+        private bool exento;
         private int cantidad_Disponible;
 
         /// Propiedad de nombre
@@ -118,7 +118,7 @@ namespace Company
             set { descripcion = value; }
         }
 
-        public int Exento
+        public bool Exento
         {
             get { return exento; }
             set { exento = value; }
@@ -186,6 +186,23 @@ namespace Company
 
     }
 
+    public class ProductoPedido
+    {
+        private string name;
+        private int quantity;
+
+        public string nombre
+        {
+            get { return name; }
+            set { name = value; }
+        }
+        public int Quantity
+        {
+            get { return quantity; }
+            set { quantity = value; }
+        }
+    }
+
     public class Pedido
     {
         private long id;
@@ -193,7 +210,7 @@ namespace Company
         private long sucursal;
         private string telefono;
         private string hora;
-        private List<Producto> Productos;
+        private List<ProductoPedido> Productos;
 
 
         /// Propiedad de Cedula
@@ -231,7 +248,7 @@ namespace Company
             set { hora = value; }
         }
 
-        public List<Producto> productos
+        public List<ProductoPedido> productos
         {
             get { return Productos; }
             set { Productos = value; }
@@ -241,20 +258,20 @@ namespace Company
 
     public class Empleado
     {
-        private int id;
-        private int sucursal;
+        private long id;
+        private long sucursal;
         private string nombre;
         private string Puesto;
 
         /// Propiedad de id
-        public int id_Empleado
+        public long id_Empleado
         {
             get { return id; }
             set { id = value; }
         }
 
         /// Propiedad de id
-        public int id_Sucursal
+        public long id_Sucursal
         {
             get { return sucursal; }
             set { sucursal = value; }

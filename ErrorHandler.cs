@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace ErrorHandler
 {
@@ -23,6 +20,8 @@ namespace ErrorHandler
             get { return errMessage.ToString(); }
             set
             {
+                string path = System.Windows.Forms.Application.StartupPath + "error.txt";
+                System.IO.File.WriteAllText(@path, value);
                 errMessage.AppendLine(value);
             }
         }

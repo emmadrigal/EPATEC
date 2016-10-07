@@ -3,5 +3,5 @@
   <username>emmanuel</username>
   <password>password</password>
   <database>EPATEC</database>
-  <server>DESKTOP-KAP1UKU\SQLSERVER</server>
+  <server>GHOST\SQLSERVER</server>
 </DataBase>

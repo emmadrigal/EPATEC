@@ -12,25 +12,21 @@ namespace DatabaseConnection
         private SqlConnection myConnection;
         private ErrorHandler.ErrorHandler err;
         string connectionString;
-        /*
-        private string username;
-        private string password;
-        private string serverurl;
-        private string database;
-        */
 
-        //Constructor, inicializa la interfaz con la base de datos, crea el objeto SqlConnection que se encarga de la coneccion
+        //Constructor, it initialices the interface with the DB, it creates the SqlConnection in charge of the connection
         public Connection()
         {
-            err = new ErrorHandler.ErrorHandler();
-            XmlDocument doc = new XmlDocument();
-            string path = System.Windows.Forms.Application.StartupPath;
+            err = new ErrorHandler.ErrorHandler();//Error handler in order to store errors
+            XmlDocument doc = new XmlDocument();//Calls the data from the config file
+            string path = System.Windows.Forms.Application.StartupPath;//Path to the current place where the file is being executed
             doc.Load(path + "\\config.xml");
 
+            //Calls each of the attributes
             string server = doc["DataBase"]["server"].InnerText;
             string DBname = doc["DataBase"]["database"].InnerText;
             string username = doc["DataBase"]["username"].InnerText;
             string password = doc["DataBase"]["password"].InnerText;
+            //Builds the connection string based on the received attributes
             connectionString = "Persist Security Info=False;" +
                                        "User ID=" + username +
                                        ";PWD=" + password +
@@ -38,9 +34,13 @@ namespace DatabaseConnection
                                        ";Data Source=" + server;
         }
 
-        //Crea un nuevo cliente y lo agrega a la base de datos
+
+        /*
+		Methods for intercading with the client table
+		*/
         public void crear_Cliente(Company.Cliente cliente)
         {
+            //Creates parameters to be used
             SqlParameter[] myparm = new SqlParameter[6];
             myparm[0] = new SqlParameter("@Cedula", cliente.Cedula_Cliente);
             myparm[1] = new SqlParameter("@Nombre", cliente.Nombre);
@@ -49,10 +49,12 @@ namespace DatabaseConnection
             myparm[4] = new SqlParameter("@FechaNacimiento", SqlDbType.DateTime);
             myparm[5] = new SqlParameter("@Telefono", cliente.Telefono);
 
+            //adds birth in the correct format
             myparm[4].Value = cliente.Nacimiento;//Agrega la fecha bajo el formato correcto
 
             string command = "INSERT INTO CLIENTE (Cedula_Cliente, Nombre, Apellidos, Grado_de_Penalizacion, Lugar_de_Residencia, Fecha_de_Nacimiento, Telefono) VALUES (@Cedula, @Nombre, @Apellidos, 0, @Residencia, @FechaNacimiento, @Telefono); ";
 
+            //Executes the command
             ExecuteCommandWrite(command, myparm);
         }
 
@@ -60,6 +62,7 @@ namespace DatabaseConnection
         {
             SqlParameter myparm = new SqlParameter("@Cedula", cedula);
 
+            //Query to be made
             string command = "SELECT * FROM CLIENTE WHERE Cedula_Cliente = @Cedula;";
             using (myConnection = new SqlConnection(connectionString))
             {
@@ -70,16 +73,17 @@ namespace DatabaseConnection
                     comando.Parameters.Add(myparm);
                     using (SqlDataReader reader = comando.ExecuteReader())
                     {
+                        //If at least one object was found
                         if (reader.Read())
                         {
-
+                            //Creates and returns the correct object
                             Company.Cliente cliente = new Company.Cliente();
                             cliente.Cedula_Cliente = (long)reader["Cedula_Cliente"];
                             cliente.Nombre = (string)reader["Nombre"];
                             cliente.Apellidos = (string)reader["Apellidos"];
                             cliente.Penalizacion = (int)reader["Grado_de_Penalizacion"];
                             cliente.Residencia = (string)reader["Lugar_de_Residencia"];
-                            cliente.Nacimiento = (string)reader["Fecha_de_Nacimiento"];
+                            cliente.Nacimiento = ((DateTime)reader["Fecha_de_Nacimiento"]).ToString("MM-dd-yyyy");
                             cliente.Telefono = (string)reader["Telefono"];
                             return cliente;
                         }
@@ -92,8 +96,10 @@ namespace DatabaseConnection
             }
         }
 
+
         internal List<Producto> get_AllProductsProv(string provedor)
         {
+            //Query to be executed
             string command = "SELECT * FROM PRODUCTO WHERE PRODUCTO.Cedula_Provedor = @cedula;";
             SqlParameter param = new SqlParameter("@cedula", provedor);
 
@@ -109,17 +115,133 @@ namespace DatabaseConnection
                         Company.Producto producto;
                         if (reader.HasRows)
                         {
+                            //Creates the list of all the attributes to be sent
                             List<Company.Producto> Productos = new List<Company.Producto>();
                             while (reader.Read())
                             {
+                                //Creates and returns the correct object
                                 producto = new Company.Producto();
                                 producto.nombre = (string)reader["Nombre_Producto"];
                                 producto.Descripcion = (string)reader["Descripción"];
                                 producto.Cantidad_Disponible = (int)reader["Cantidad_Disponible"];
-                                producto.Exento = (int)reader["Exento"];
+                                producto.Exento = ((bool)reader["Exento"]);
                                 Productos.Add(producto);
                             }
                             return Productos;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal List<Empleado> get_AllEmployees()
+        {
+            //Query to be executed
+            string command = "SELECT * FROM EMPLEADO;";
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.Empleado empleado;
+                        if (reader.HasRows)
+                        {
+                            //Creates and returns the correct object
+                            List<Company.Empleado> Empleados = new List<Company.Empleado>();
+                            while (reader.Read())
+                            {
+                                //Adds al the found objects
+                                empleado = new Company.Empleado();
+                                empleado.id_Empleado = (long) reader["Id_Empleado"];
+                                empleado.id_Sucursal = (long) reader["Id_Sucursal"];
+                                empleado.Nombre = (string)reader["Nombre"];
+                                empleado.puesto = (string)reader["Puesto"];
+                                Empleados.Add(empleado);
+                            }
+                            return Empleados;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal List<Proovedor> get_AllProviders()
+        {
+            //Query to be executed
+            string command = "SELECT * FROM PROVEEDOR;";
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.Proovedor provedor;
+                        if (reader.HasRows)
+                        {
+                            //Creates and returns the correct object
+                            List<Company.Proovedor> Proveedores = new List<Company.Proovedor>();
+                            while (reader.Read())
+                            {
+                                //Adds al the found objects
+                                provedor = new Company.Proovedor();
+                                provedor.Cedula_Proveedor = (long)reader["Cedula_Proveedor"];
+                                provedor.Nombre = (string)reader["Nombre"];
+                                provedor.Apellidos = (string)reader["Apellidos"];
+                                provedor.Residencia = (string)reader["Lugar_de_Residencia"];
+                                provedor.Nacimiento = ((DateTime)reader["Fecha_de_Nacimiento"]).ToString("MM-dd-yyyy");
+                                Proveedores.Add(provedor);
+                            }
+                            return Proveedores;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal List<Categoria> get_AllCategories()
+        {
+            //Creates and returns the correct object
+            string command = "SELECT * FROM CATEGORIA;";
+
+            using (myConnection = new SqlConnection(connectionString))
+            {
+                myConnection.Open();
+
+                using (SqlCommand comando = new SqlCommand(command, myConnection))
+                {
+                    using (SqlDataReader reader = comando.ExecuteReader())
+                    {
+                        Company.Categoria categoria;
+                        if (reader.HasRows)
+                        {
+                            List<Company.Categoria> Categorias = new List<Company.Categoria>();
+                            while (reader.Read())
+                            {
+                                categoria = new Company.Categoria();
+                                categoria.Nombre = (string)reader["Nombre"];
+                                categoria.Descripcion = (string)reader["Descripción"];
+                                Categorias.Add(categoria);
+                            }
+                            return Categorias;
                         }
                         else
                         {
@@ -150,7 +272,7 @@ namespace DatabaseConnection
                             {
                                 producto = new Company.ProductosVentas();
                                 producto.Nombre = (string)reader["Nombre_Producto"];
-                                producto.Sucursal= (long)reader["Id_Sucursal"];
+                                producto.Sucursal = (long)reader["Id_Sucursal"];
                                 producto.Cantidad = (int)reader["Cuenta"];
                                 Productos.Add(producto);
                             }
@@ -189,7 +311,7 @@ namespace DatabaseConnection
                                 producto.nombre = (string)reader["Nombre_Producto"];
                                 producto.Descripcion = (string)reader["Descripción"];
                                 producto.Cantidad_Disponible = (int)reader["Cantidad_Disponible"];
-                                producto.Exento = (int)reader["Exento"];
+                                producto.Exento = ((bool)reader["Exento"]);
                                 Productos.Add(producto);
                             }
                             return Productos;
@@ -367,7 +489,7 @@ namespace DatabaseConnection
 
             ExecuteCommandWrite(command, myparm);
         }
-
+    
         public void update_Telefono_Cliente(int cedula, int Telefono)
         {
             SqlParameter[] myparm = new SqlParameter[2];
@@ -390,11 +512,15 @@ namespace DatabaseConnection
 
             string comando3 = "DELETE FROM PEDIDO WHERE Cedula_Cliente = @Cedula;";
 
-            ExecuteCommandWriteOneParam(comando3, myparm);
+            SqlParameter myparm1 = new SqlParameter("@Cedula", cedula);
+
+            ExecuteCommandWriteOneParam(comando3, myparm1);
 
             string command = "DELETE FROM CLIENTE WHERE Cedula_Cliente = @Cedula;";
 
-            ExecuteCommandWriteOneParam(command, myparm);
+            SqlParameter myparm2 = new SqlParameter("@Cedula", cedula);
+
+            ExecuteCommandWriteOneParam(command, myparm2);
         }
 
         //Crea un nuevo Proovedor y lo agrega a la base de datos
@@ -482,8 +608,7 @@ namespace DatabaseConnection
                             provedor.Cedula_Proveedor = (long)reader["Cedula_Proveedor"];
                             provedor.Nombre = (string)reader["Nombre"];
                             provedor.Apellidos = (string)reader["Apellidos"];
-                            DateTime myDateTime = (DateTime)reader["Fecha_de_Nacimiento"];
-                            provedor.Nacimiento = myDateTime.ToString("MM-dd-yyyy");
+                            provedor.Nacimiento = ((DateTime)reader["Fecha_de_Nacimiento"]).ToString("MM-dd-yyyy");
                             provedor.Residencia = (string)reader["Lugar_de_Residencia"];
                             return provedor;
                         }
@@ -647,19 +772,18 @@ namespace DatabaseConnection
         public void crear_Empleado(Company.Empleado empleado)
         {
             SqlParameter[] myparm = new SqlParameter[4];
-            myparm[0] = new SqlParameter("@id", empleado.id_Empleado);
             myparm[1] = new SqlParameter("@Nombre", empleado.Nombre);
             myparm[2] = new SqlParameter("@Sucursal", empleado.id_Sucursal);
             myparm[3] = new SqlParameter("@Puesto", empleado.puesto);
 
-            string command = "INSERT INTO EMPLEADO (Id_Empleado, Id_Sucursal, Nombre, Puesto) VALUES (@id, @Nombre, @Sucursal, @Puesto); ";
+            string command = "INSERT INTO EMPLEADO (Id_Sucursal, Nombre, Puesto) VALUES @Nombre, @Sucursal, @Puesto); ";
 
             ExecuteCommandWrite(command, myparm);
         }
 
         public Company.Empleado get_Empleado(int cedula)
         {
-            SqlParameter myparm = new SqlParameter("@Cedula", cedula);
+            SqlParameter myparm = new SqlParameter("@Id_Empleado", cedula);
 
             string command = "SELECT * FROM EMPLEADO WHERE Id_Empleado = @Id_Empleado;";
             using (myConnection = new SqlConnection(connectionString))
@@ -674,8 +798,8 @@ namespace DatabaseConnection
                         if (reader.Read())
                         {
                             Company.Empleado empleado = new Company.Empleado();
-                            empleado.id_Empleado = (int)reader["Id_Empleado"];
-                            empleado.id_Sucursal = (int)reader["Id_Sucursal"];
+                            empleado.id_Empleado = (long)reader["Id_Empleado"];
+                            empleado.id_Sucursal = (long)reader["Id_Sucursal"];
                             empleado.Nombre = (string)reader["Nombre"];
                             empleado.puesto = (string)reader["Puesto"];
                             return empleado;
@@ -750,7 +874,7 @@ namespace DatabaseConnection
             ExecuteCommandWrite(command, myparm);
         }
 
-        public Company.Producto get_Producto(string nombre)
+        public List<Company.Producto> get_Producto(string nombre)
         {
             SqlParameter myparm = new SqlParameter("@Nombre", nombre);
 
@@ -772,9 +896,11 @@ namespace DatabaseConnection
                             producto.Cedula_Provedor = (long)reader["Cedula_Provedor"];
                             producto.categoria = (string)reader["Nombre_Categoría"];
                             producto.Descripcion = (string)reader["Descripción"];
-                            producto.Exento = (int)reader["Exento"];
+                            producto.Exento = ((bool)reader["Exento"]);
                             producto.Cantidad_Disponible = (int)reader["Cantidad_Disponible"];
-                            return producto;
+                            List<Company.Producto> output = new List<Company.Producto>();
+                            output.Add(producto);
+                            return output;
                         }
                         else
                         {
@@ -785,35 +911,37 @@ namespace DatabaseConnection
             }
         }
 
-        public void update_Nombre_Producto(int id, string Nombre)
+        public void update_Nombre_Producto(string id, string Nombre)
         {
             SqlParameter[] myparm = new SqlParameter[2];
             myparm[0] = new SqlParameter("@Nombre", Nombre);
             myparm[1] = new SqlParameter("@id", id);
 
-            string command = "UPDATE PRODUCTO SET Nombre = @Nombre WHERE id = @id;";
+            string command = "UPDATE PRODUCTO SET Nombre_Producto = @Nombre WHERE Nombre_Producto = @id;";
 
             ExecuteCommandWrite(command, myparm);
         }
 
-        public void update_Descripcion_Producto(int id, string Descripcion)
+        public void update_Descripcion_Producto(string id, string Descripcion)
         {
             SqlParameter[] myparm = new SqlParameter[2];
             myparm[0] = new SqlParameter("@Descripcion", Descripcion);
             myparm[1] = new SqlParameter("@id", id);
 
-            string command = "UPDATE PRODUCTO SET Descripción = @Descripcion WHERE id = @id;";
+            string command = "UPDATE PRODUCTO SET Descripción = @Descripcion WHERE Nombre_Producto = @id;";
 
             ExecuteCommandWrite(command, myparm);
         }
 
-        public void update_Cantidad_Producto(int id, int Cantidad)
+        public void update_Cantidad_Producto(string id, int Cantidad)
         {
             SqlParameter[] myparm = new SqlParameter[2];
             myparm[0] = new SqlParameter("@Cantidad", Cantidad);
             myparm[1] = new SqlParameter("@id", id);
 
-            string command = "UPDATE PRODUCTO SET Cantidad = @Cantidad WHERE id = @id;";
+            string command = "UPDATE PRODUCTO SET Cantidad_Disponible = @Cantidad WHERE Nombre_Producto = @id;";
+
+
 
             ExecuteCommandWrite(command, myparm);
         }
@@ -874,16 +1002,18 @@ namespace DatabaseConnection
                     }
 
                     //Inserta cada uno de las relaciones entre Pedido y Producto que establece esto
-                    string command_Productos = "INSERT INTO CONTIENE (Nombre_Producto, Id_Pedido) VALUES (@Producto, @Pedido); ";
+                    string command_Productos = "INSERT INTO CONTIENE (Nombre_Producto, Id_Pedido, Cantidad) VALUES (@Producto, @Pedido, @Cantidad); ";
                     SqlCommand comando = new SqlCommand(command_Productos, myConnection);
                     comando.Parameters.Add("@Pedido", SqlDbType.BigInt);
                     comando.Parameters.Add("@Producto", SqlDbType.NVarChar);
+                    comando.Parameters.Add("@Cantidad", SqlDbType.Int);
 
-                    foreach (Company.Producto producto in pedido.productos)
+                    foreach (Company.ProductoPedido producto in pedido.productos)
                     {
                         try
                         {
                             comando.Parameters["@Producto"].Value = producto.nombre;
+                            comando.Parameters["@Cantidad"].Value = producto.Quantity;
                             comando.Parameters["@Pedido"].Value = id;
                             comando.ExecuteNonQuery();
                         }
@@ -942,11 +1072,12 @@ namespace DatabaseConnection
                     {
                         if (reader.HasRows)
                         {
-                            pedido.productos = new List<Company.Producto>();
+                            pedido.productos = new List<Company.ProductoPedido>();
                             if (reader.Read())
                             {
-                                Company.Producto producto = new Company.Producto();
+                                Company.ProductoPedido producto = new Company.ProductoPedido();
                                 producto.nombre = (string)reader["Nombre_Producto"];
+                                producto.Quantity= (int)reader["Cantidad"];
                                 pedido.productos.Add(producto);
                             }
                         }
@@ -985,6 +1116,7 @@ namespace DatabaseConnection
                                 pedido.Telefono = (string)reader["Telefono_Preferido"];
                                 pedido.Hora = ((DateTime)reader["Hora_de_Creación"]).ToString();
 
+                                pedido.productos = new List<ProductoPedido>();
                                 using (SqlConnection myConnection2 = new SqlConnection(connectionString))
                                 {
                                     myConnection2.Open();
@@ -994,14 +1126,14 @@ namespace DatabaseConnection
                                         comando2.Parameters.AddWithValue("@id", id);
                                         using (SqlDataReader reader2 = comando2.ExecuteReader())
                                         {
-                                            Company.Producto producto;
+                                            Company.ProductoPedido producto;
                                             if (reader2.HasRows)
                                             {
                                                 while (reader2.Read())
                                                 {
-                                                    producto = new Company.Producto();
+                                                    producto = new Company.ProductoPedido();
                                                     producto.nombre = (string)reader2["Nombre_Producto"];
-                                                    producto.Descripcion = (string)reader2["Descripción"];
+                                                    producto.Quantity = (int)reader2["Cantidad"];
                                                     pedido.productos.Add(producto);
                                                 }
                                             }
@@ -1026,7 +1158,6 @@ namespace DatabaseConnection
         {
             string command = "SELECT * FROM CLIENTE;";
 
-
             using (myConnection = new SqlConnection(connectionString))
             {
                 myConnection.Open();
@@ -1036,7 +1167,7 @@ namespace DatabaseConnection
                     using (SqlDataReader reader = comando.ExecuteReader())
                     {
                         Company.Cliente cliente;
-                        if (reader.Read())
+                        if (reader.HasRows)
                         {
                             List<Company.Cliente> Clientes = new List<Company.Cliente>();
                             while (reader.Read())
@@ -1046,7 +1177,7 @@ namespace DatabaseConnection
                                 cliente.Nombre = (string)reader["Nombre"];
                                 cliente.Apellidos = (string)reader["Apellidos"];
                                 cliente.Residencia = (string)reader["Lugar_de_Residencia"];
-                                cliente.Nacimiento = (string)reader["Fecha_de_Nacimiento"];
+                                cliente.Nacimiento = ((DateTime)reader["Fecha_de_Nacimiento"]).ToString("MM-dd-yyyy");
                                 cliente.Telefono = (string)reader["Telefono"];
                                 Clientes.Add(cliente);
                             }

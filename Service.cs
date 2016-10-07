@@ -2,14 +2,25 @@
 using System;
 using System.Collections.Generic;
 using System.Web;
-using System.Net;
-using System.Text;
 
 namespace Service
 {
     public class Service
     {
-        //Function of the GET methods
+        private ErrorHandler.ErrorHandler err;//Used to store error messages in case of desired debugging
+
+
+        public Service()
+        {
+            err = new ErrorHandler.ErrorHandler();
+        }
+
+        /*Function of the GET methods
+		These functions receive the id of the desired member and the call the database,
+		if no member is found it returns a null, so this class parses that into an appropiate msg
+		
+		In order to construct a json to send to the DB this classes use the Json.NET library which knowing the attributes of aclass create the corresponding json string
+		*/
         public string get_Cliente(string id)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
@@ -35,7 +46,7 @@ namespace Service
         public string get_Producto(string id)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            Company.Producto producto = DBConnection.get_Producto(id);
+            List<Company.Producto> producto = DBConnection.get_Producto(id);
             if (producto == null)
             {
                 return "Empleado no encontrado";
@@ -136,6 +147,39 @@ namespace Service
             return JsonConvert.SerializeObject(productos);
         }
 
+        internal string get_AllEmployees()
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.Empleado> employees = DBConnection.get_AllEmployees();
+            if (employees == null)
+            {
+                return "No hay categorias";
+            }
+            return JsonConvert.SerializeObject(employees);
+        }
+
+        internal string get_AllCategories()
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.Categoria> categories = DBConnection.get_AllCategories();
+            if (categories == null)
+            {
+                return "No hay categorias";
+            }
+            return JsonConvert.SerializeObject(categories);
+        }
+
+        internal string get_AllProviders()
+        {
+            DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+            List<Company.Proovedor> providers = DBConnection.get_AllProviders();
+            if (providers == null)
+            {
+                return "No hay provedores";
+            }
+            return JsonConvert.SerializeObject(providers);
+        }
+
         internal string get_AllProducts()
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
@@ -180,62 +224,120 @@ namespace Service
             return JsonConvert.SerializeObject(pedidos);
         }
 
-        //Function of the POST methods
+        /*Function of the POST methods
+		These methods recieve a json of the appropiate type, this class tries to parse it back into the appropiate type, if it failes it sends a msg 
+		Since the json's are recieved through the url and not the Body, there us also a need to decode the URL enconding.
+		
+		This methods don't have a response
+		
+		*/
         public void crear_Cliente(string json)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            json = HttpUtility.UrlDecode(json);
-            Company.Cliente cliente = JsonConvert.DeserializeObject<Company.Cliente>(json);//Deserializa el dato a un objeto
-            DBConnection.crear_Cliente(cliente);
+            try
+            {
+                json = HttpUtility.UrlDecode(json);
+                Company.Cliente cliente = JsonConvert.DeserializeObject<Company.Cliente>(json);//Deserializa el dato a un objeto
+                DBConnection.crear_Cliente(cliente);
+            }
+            catch (Exception ex)
+            {
+                err.ErrorMessage = ex.Message.ToString();
+            }
         }
 
         public void crear_Producto(string json)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            json = HttpUtility.UrlDecode(json);
-            Company.Producto producto = JsonConvert.DeserializeObject<Company.Producto>(json);//Deserializa el dato a un objeto
-            DBConnection.crear_Producto(producto);
+            try
+            {
+                json = HttpUtility.UrlDecode(json);
+                Company.Producto producto = JsonConvert.DeserializeObject<Company.Producto>(json);//Deserializa el dato a un objeto
+                DBConnection.crear_Producto(producto);
+            }
+            catch (Exception ex)
+            {
+                err.ErrorMessage = ex.Message.ToString();
+            }
+
         }
 
         public void crear_Categoria(string json)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            json = HttpUtility.UrlDecode(json);
-            Company.Categoria categoria = JsonConvert.DeserializeObject<Company.Categoria>(json);//Deserializa el dato a un objeto
-            DBConnection.crear_Categoria(categoria);
+            try
+            {
+                json = HttpUtility.UrlDecode(json);
+                Company.Categoria categoria = JsonConvert.DeserializeObject<Company.Categoria>(json);//Deserializa el dato a un objeto
+                DBConnection.crear_Categoria(categoria);
+            }
+            catch (Exception ex)
+            {
+                err.ErrorMessage = ex.Message.ToString();
+            }
+
         }
 
         public void crear_Empleado(string json)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            json = HttpUtility.UrlDecode(json);
-            Company.Empleado empleado = JsonConvert.DeserializeObject<Company.Empleado>(json);//Deserializa el dato a un objeto
-            DBConnection.crear_Empleado(empleado);
+            try
+            {
+                json = HttpUtility.UrlDecode(json);
+                Company.Empleado empleado = JsonConvert.DeserializeObject<Company.Empleado>(json);//Deserializa el dato a un objeto
+                DBConnection.crear_Empleado(empleado);
+            }
+            catch (Exception ex)
+            {
+                err.ErrorMessage = ex.Message.ToString();
+            }
+
         }
 
         public void crear_Provedor(string json)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            json = HttpUtility.UrlDecode(json);
+            try
+            {
+                json = HttpUtility.UrlDecode(json);
+                Company.Proovedor provedor = JsonConvert.DeserializeObject<Company.Proovedor>(json);//Deserializa el dato a un objeto
+                DBConnection.crear_Provedor(provedor);
+            }
+            catch (Exception ex)
+            {
+                err.ErrorMessage = ex.Message.ToString();
+            }
 
-            Company.Proovedor provedor = JsonConvert.DeserializeObject<Company.Proovedor>(json);//Deserializa el dato a un objeto
-            DBConnection.crear_Provedor(provedor);
         }
 
         public void crear_Pedido(string json)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
-            json = HttpUtility.UrlDecode(json);
-            Company.Pedido pedido = JsonConvert.DeserializeObject<Company.Pedido>(json);//Deserializa el dato a un objeto
-            DBConnection.crear_Pedido(pedido);
+            try
+            {
+                json = HttpUtility.UrlDecode(json);
+                Company.Pedido pedido = JsonConvert.DeserializeObject<Company.Pedido>(json);//Deserializa el dato a un objeto
+
+                DBConnection.crear_Pedido(pedido);
+            }
+            catch (Exception ex)
+            {
+                err.ErrorMessage = ex.Message.ToString();
+            }
+
         }
 
 
-        //Function of the PUT methods
+        /*Function of the PUT methods
+		These methods are in charge of the update of records on the DB
+		They recieve all of the data from the webApp as stablished by the procotol
+		*/
+		//Update for the user table
         public void update_Cliente(string id, string campo, string newvalue)
         {
-            id = id.Remove(id.Length - 1);
+            id = id.Remove(id.Length - 1);//Deletes the last \ in order to only have the useful data.
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
+
             if (campo == "nombre/")
             {
                 DBConnection.update_Nombre_Cliente(Int32.Parse(id), newvalue);
@@ -261,25 +363,27 @@ namespace Service
                 DBConnection.update_Telefono_Cliente(Int32.Parse(id), Int32.Parse(newvalue));
             }
         }
-
-        public void update_Producto(string id, string campo, string newvalue)
+		
+		//Update for the producto table
+        public void update_Producto(string name, string campo, string newvalue)
         {
-            id = id.Remove(id.Length - 1);
+            name = name.Remove(name.Length - 1);
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
             if (campo == "nombre/")
             {
-                DBConnection.update_Nombre_Producto(Int32.Parse(id), newvalue);
+                DBConnection.update_Nombre_Producto(name, newvalue);
             }
             else if (campo == "descripcion/")
             {
-                DBConnection.update_Descripcion_Producto(Int32.Parse(id), newvalue);
+                DBConnection.update_Descripcion_Producto(name, newvalue);
             }
             else if (campo == "cantidad/")
             {
-                DBConnection.update_Cantidad_Producto(Int32.Parse(id), Int32.Parse(newvalue));
+                DBConnection.update_Cantidad_Producto(name, Int32.Parse(newvalue));
             }
         }
 
+		//Update for the categoria table
         public void update_Categoria(string id, string campo, string newvalue)
         {
             id = id.Remove(id.Length - 1);
@@ -290,6 +394,7 @@ namespace Service
             }
         }
 
+		//Update for the employee table
         public void update_Empleado(string id, string campo, string newvalue)
         {
             id = id.Remove(id.Length - 1);
@@ -308,6 +413,7 @@ namespace Service
             }
         }
 
+		//Update for the supplier table
         public void update_Provedor(string id, string campo, string newvalue)
         {
             id = id.Remove(id.Length - 1);
@@ -330,13 +436,16 @@ namespace Service
             }
         }
 
+		//Update for the pedido table
         public void update_Pedido(string id, string campo, string newvalue)
         {
             //No hay metodo implementado para cambiar los datos de un pedido
         }
 
 
-        //Function of the DELETE methods
+        /*Function of the DELETE methods
+		It recieves the primary key of the object that is to be destroyed
+		*/
         public void eliminar_Cliente(string id)
         {
             DatabaseConnection.Connection DBConnection = new DatabaseConnection.Connection();
